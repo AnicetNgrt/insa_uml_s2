@@ -58,7 +58,7 @@ vpath %.cpp $(SRC_DIRS) $(ENTRY_POINTS_SRC_DIRS)
 #		des fichiers headers dont dépend la source compilée
 define make-goal
 $1/%.o: %.cpp
-	g++ -MMD -c $$< -o $$@
+	g++ $(OPTIONS) -MMD -c $$< -o $$@
 endef
 
 # Cible principale

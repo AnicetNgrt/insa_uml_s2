@@ -15,12 +15,12 @@ public:
 
   string get_username() const override;
   string get_password_hash() const override;
-  Maybe<User const &> get_authed_user() const override;
+  Maybe<User const *> get_authed_user() const override;
   Maybe<fstream> get_file(string key) const override;
-  Maybe<UserFlag> get_user_flag(const User const &user) const override;
+  Maybe<UserFlag> get_user_flag(User const *user) const override;
 
-  void set_authed_user(const User const &user) override;
-  void set_user_flag(const User const &user, UserFlag flag) override;
+  void set_authed_user(User const *user) override;
+  void set_user_flag(User const *user, UserFlag flag) override;
 
 private:
 };

@@ -19,17 +19,18 @@ int value = Unwrap(maybe);
 
 #pragma once
 
-#include <variant>
+#include <optional>
 
 using namespace std;
 
-template <typename ValueType> struct Maybe {
-  variant<ValueType, nullptr_t> const maybe_value;
+template <typename ValueType> 
+struct Maybe {
+  optional<ValueType> const maybe_value;
   bool const is_absent;
 };
 
 #define Some(value)                                                            \
   { value, false }
 #define None                                                                   \
-  { nullptr, true }
-#define Unwrap(maybe) get<0>(maybe.maybe_value)
+  { {}, true }
+#define Unwrap(maybe) maybe.maybe_value.value()
