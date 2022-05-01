@@ -5,8 +5,8 @@
 /* Usage example
 
 Maybe<int> divide(int a, int b) {
-	if (b == 0) return None;
-	return Some(a/b);
+        if (b == 0) return None;
+        return Some(a/b);
 }
 
 ...
@@ -21,12 +21,15 @@ int value = Unwrap(maybe);
 
 #include <variant>
 
-template<typename ValueType>
-struct Maybe {
-	std::variant<ValueType, std::nullptr_t> const maybe_value;
-	bool const is_absent;
+using namespace std;
+
+template <typename ValueType> struct Maybe {
+  variant<ValueType, nullptr_t> const maybe_value;
+  bool const is_absent;
 };
 
-#define Some(value) { .maybe_value=value, .is_absent=false }
-#define None { .maybe_value=nullptr, .is_absent=true }
-#define Unwrap(maybe) std::get<0>(maybe.maybe_value)
+#define Some(value)                                                            \
+  { value, false }
+#define None                                                                   \
+  { nullptr, true }
+#define Unwrap(maybe) get<0>(maybe.maybe_value)

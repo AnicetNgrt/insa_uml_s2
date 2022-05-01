@@ -2,6 +2,8 @@
 #include "Lib/Result.h"
 #include <iostream>
 
+using namespace std;
+
 Maybe<int> divide_with_maybe(int a, int b) {
     if (b == 0) return None;
     return Some(a/b);
@@ -27,7 +29,7 @@ int main() {
         auto result = divide_with_result(1, 4);
         if (result.is_error) {
             switch (Unwrap(result.error_value)) {
-                case DivisionError::DIVIDE_BY_ZERO: std::cout << "Division by zero" << std::endl;
+                case DivisionError::DIVIDE_BY_ZERO: cout << "Division by zero" << endl;
             }
             return 1;
         }
