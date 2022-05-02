@@ -1,16 +1,25 @@
 #pragma once
 
-#include <functional>
 #include "Maybe.h"
+#include <functional>
 
-template<typename ItemType>
-class Stream {
+using namespace std;
+
+template <typename ItemType> class Stream {
 public:
-    Stream(std::function<Maybe<ItemType>()> const next_fn);
-    Maybe<ItemType> next() const {
-        return next_fn();
-    }
+  typedef function<Maybe<ItemType>()> NextFn;
+  typedef function<void()> CloseFn;
+
+  Stream() {
+    receive = []() -> Maybe<ItemType> { return None; };
+    close = []() {};
+  };
+
+  Stream(NextFn receive, CloseFn close) : receive(receive), close(close){};
+  ~Stream() { close(); }
+
+  NextFn const receive;
 
 private:
-    std::function<Maybe<ItemType>()> const next_fn;
+  CloseFn const close;
 };
