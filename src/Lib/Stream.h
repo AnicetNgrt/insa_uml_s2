@@ -10,10 +10,8 @@ public:
   typedef function<Maybe<ItemType>()> NextFn;
   typedef function<void()> CloseFn;
 
-  Stream() {
-    receive = []() -> Maybe<ItemType> { return None; };
-    close = []() {};
-  };
+  Stream()
+      : receive([]() -> Maybe<ItemType> { return None; }), close([]() {}){};
 
   Stream(NextFn receive, CloseFn close) : receive(receive), close(close){};
   ~Stream() { close(); }
