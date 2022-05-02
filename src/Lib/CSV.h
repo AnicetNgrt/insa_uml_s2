@@ -29,6 +29,8 @@ public:
     field = string_conversion(str_val);                                        \
   } catch (const std::out_of_range &e) {                                       \
     return false;                                                              \
+  } catch (const std::invalid_argument &e) {                                   \
+    return false;                                                              \
   }
 
 #define CSV_TRY_ASSIGN_INT(field, key) CSV_TRY_ASSIGN(field, key, std::stoi)

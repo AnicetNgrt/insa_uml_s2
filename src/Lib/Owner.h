@@ -12,7 +12,10 @@ public:
 
   string get_id() const { return id; };
 
-  bool assign_from_csv(CSV_Row const &csv_row) override;
+  bool assign_from_csv(CSV_Row const &csv_row) override {
+    CSV_TRY_ASSIGN_STRING(id, "id")
+    return true;
+  }
 
 private:
   string id;
