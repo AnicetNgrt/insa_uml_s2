@@ -1,5 +1,9 @@
 #pragma once
 
+#include <string>
+
+using namespace std;
+
 struct Timestamp {
   int year;
   int month;
@@ -8,3 +12,5 @@ struct Timestamp {
   int minute;
   int second;
 };
+
+Timestamp timestamp_from_string(string s);

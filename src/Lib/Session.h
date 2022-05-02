@@ -1,27 +1,26 @@
-/*
-   @file Session.h
-*/
-
 #pragma once
 
-#include "ISession.h"
 #include <string>
 
-class Session : public ISession {
-public:
-  Session(string username, string password, IPasswordHasher &hasher,
-          unordered_map<string, string> &files);
-  ~Session();
+using namespace std;
 
-  string get_username() const override;
-  string get_password_hash() const override;
-  Maybe<User const *> get_authed_user() const override;
-  Maybe<Database<User> const *> get_users_database() const override;
-  Maybe<Database<Cleaner> const *> get_cleaners_database() const override;
-  Maybe<UserFlag> get_user_flag(User const *user) const override;
+#include "Maybe.h"
+#include "Database.h"
+#include "User.h"
+#include "Cleaner.h"
+#include "Owner.h"
+#include "Measurement.h"
+#include "Sensor.h"
 
-  void set_authed_user(User const *user) override;
-  void set_user_flag(User const *user, UserFlag flag) override;
+struct Session {
+  string const username;
+  string const password;
+  Database<User> const & const users_db;
+  Database<Cleaner> const & const cleaners_db;
+  Database<Owner> const & const owners_db;
+  Database<Measurement> const & const measurements_db;
+  Database<Sensor> const & const sensors_db;
 
-private:
+  Maybe<User const*> authed_user;
+  unordered_map<string, UserFlag> users_flags;
 };
