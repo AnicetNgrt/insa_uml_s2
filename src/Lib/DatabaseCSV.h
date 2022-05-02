@@ -39,7 +39,9 @@ public:
     return new Stream(receive, close);
   }
 
-  Stream<Data> *stream();
+  Stream<Data> *stream() {
+    return filter_and_stream([]() { return true; });
+  }
 
 private:
   string csv_file_path;

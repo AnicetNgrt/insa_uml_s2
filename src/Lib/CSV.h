@@ -19,3 +19,8 @@ typedef Result<CSV_Row, CSV_ParseError> ParsedCSV_Row;
 
 Result<Stream<ParsedCSV_Row>*, CSV_ParseError>
 csv_parser_from_file(string csv_file_path);
+
+class CSV_Assignable {
+public:
+  virtual bool assign_from_csv(CSV_Row const &csv_row) = 0;
+};

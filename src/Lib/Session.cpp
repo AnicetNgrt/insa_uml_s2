@@ -22,7 +22,11 @@ Maybe<User const *> Session::get_authed_user() const {
   // TODO
 }
 
-Maybe<fstream> Session::get_file(string key) const {
+Maybe<Database<User> const *> Session::get_users_database() const {
+  // TODO
+}
+
+Maybe<Database<Cleaner> const *> Session::get_cleaners_database() const {
   // TODO
 }
 
