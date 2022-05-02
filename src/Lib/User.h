@@ -6,12 +6,6 @@ using namespace std;
 
 #include "CSV.h"
 
-enum class UserFlag { RELIABLE, UNRELIABLE };
-
-enum class UserPermissionLevel { BASIC, GOVERNMENT };
-
-UserPermissionLevel user_permission_level_from_string(string s);
-
 class User : public CSV_Assignable {
 public:
   User();
@@ -20,10 +14,11 @@ public:
   string get_username() const;
   UserPermissionLevel get_permission_level() const;
 
-  bool assign_from_csv(CSV_Row const &csv_row) override  {
+  bool assign_from_csv(CSV_Row const &csv_row) override {
     CSV_TRY_ASSIGN_STRING(password_hash, "password hash")
     CSV_TRY_ASSIGN_STRING(username, "username")
-    CSV_TRY_ASSIGN(permission_level, "permission level", user_permission_level_from_string)
+    CSV_TRY_ASSIGN(permission_level, "permission level",
+                   user_permission_level_from_string)
     return true;
   }
 
@@ -32,3 +27,15 @@ private:
   string username;
   UserPermissionLevel permission_level;
 };
+
+enum class UserFlag { RELIABLE, UNRELIABLE };
+
+enum class UserPermissionLevel { BASIC, GOVERNMENT };
+
+UserPermissionLevel user_permission_level_from_string(string s) {
+  if (s.compare("basic") == 0)
+    return UserPermissionLevel::BASIC;
+  if (s.compare("government") == 0)
+    return UserPermissionLevel::GOVERNMENT;
+  throw std::invalid_argument("no enum member could be parsed");
+}
