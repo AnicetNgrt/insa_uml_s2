@@ -1,5 +1,7 @@
 #include "Session.h"
 
+#include "DatabaseCSV.h"
+
 Result<Session, string> from_args(const char **argv, size_t argc)
 {
 	/*****************************
@@ -37,7 +39,6 @@ Result<Session, string> from_args(const char **argv, size_t argc)
 		new DatabaseCSV<Measurement>("dataset/measurements.csv"),
 		new DatabaseCSV<Sensor>("dataset/sensors.csv"),
 		None,
-		
 	};
 	return Ok(opened_session);
 }
