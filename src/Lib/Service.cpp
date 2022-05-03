@@ -6,10 +6,14 @@ Service::Service(Session &session) : session(session)
 
 Stream<Measurement>* Service::measurements(string sensor_id, Maybe<MeasurementType> type, Maybe<Timestamp> timestamp)
 {
-  
+
 }
 
 Result<double, const char*> Service::air_quality_area(double x, double y, double rad, Maybe<Timestamp> start, Maybe<Timestamp> end)
+{
+}
+
+Result<double, const char*> Service::air_quality(double x, double y, Timestamp &at)
 {
 }
 

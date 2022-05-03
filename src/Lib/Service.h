@@ -13,6 +13,7 @@ public:
   Result<double, const char *> air_quality_area(double x, double y, double rad,
                                                 Maybe<Timestamp> start,
                                                 Maybe<Timestamp> end) override;
+	Result<double, const char*> air_quality(double x, double y, Timestamp &at) override;
   Stream<Sensor> *similar_sensors(string sensor_id, int n,
                                   Maybe<Timestamp> start,
                                   Maybe<Timestamp> end) override;
