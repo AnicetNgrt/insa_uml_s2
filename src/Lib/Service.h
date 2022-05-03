@@ -7,7 +7,9 @@ class Service : public IService {
 public:
   Service(Session &session);
 
-  Stream<Measurement> *measurements() override;
+  Stream<Measurement> *measurements(string sensor_id,
+                                    Maybe<MeasurementType> type,
+                                    Maybe<Timestamp> timestamp) override;
   Result<double, const char *> air_quality_area(double x, double y, double rad,
                                                 Maybe<Timestamp> start,
                                                 Maybe<Timestamp> end) override;

@@ -4,8 +4,9 @@ Service::Service(Session &session) : session(session)
 {
 }
 
-Stream<Measurement>* Service::measurements()
+Stream<Measurement>* Service::measurements(string sensor_id, Maybe<MeasurementType> type, Maybe<Timestamp> timestamp)
 {
+  
 }
 
 Result<double, const char*> Service::air_quality_area(double x, double y, double rad, Maybe<Timestamp> start, Maybe<Timestamp> end)
@@ -26,7 +27,6 @@ Result<double, const char*> Service::provider_cleaners_efficiency(string provide
 
 void Service::flag_owner(string owner_id, OwnerFlag flag)
 {
-    Database<Owner> ow = new DatabaseCSV("dataset/users.csv");
 }
 
 Maybe<const char*> Service::authenticate(string username, string password)
