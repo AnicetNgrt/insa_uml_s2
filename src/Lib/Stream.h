@@ -23,17 +23,6 @@ public:
       NextFn receive, CloseFn close = []() {})
       : _receive(receive), close(close) {}
 
-  // template <typename ItemTypeB>
-  // StreamClosure(
-  //     Stream<ItemTypeB> * dependencies[], NextFn receive,
-  //     CloseFn close = []() {})
-  //     : _receive(receive) {
-  //   this->close = [&]() {
-  //     delete[] dependencies;
-  //     close();
-  //   };
-  // }
-
   ~StreamClosure() { close(); }
 
   Maybe<ItemType> receive() override { return _receive(); };

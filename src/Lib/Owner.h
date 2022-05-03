@@ -20,3 +20,5 @@ public:
 private:
   string id;
 };
+
+enum class OwnerFlag { RELIABLE, UNRELIABLE };

@@ -28,8 +28,6 @@ private:
   UserPermissionLevel permission_level;
 };
 
-enum class UserFlag { RELIABLE, UNRELIABLE };
-
 enum class UserPermissionLevel { BASIC, GOVERNMENT };
 
 UserPermissionLevel user_permission_level_from_string(string s) {

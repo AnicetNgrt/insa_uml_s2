@@ -22,5 +22,7 @@ struct Session {
   Database<Sensor> const & const sensors_db;
 
   Maybe<User const*> authed_user;
-  unordered_map<string, UserFlag> users_flags;
+  unordered_map<string, OwnerFlag> owners_flags;
 };
+
+Session from_args(const char** argv, size_t argc);
