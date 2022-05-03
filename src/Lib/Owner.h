@@ -8,7 +8,7 @@ using namespace std;
 
 class Owner : public CSV_Assignable {
 public:
-  Owner();
+  Owner() {};
 
   string get_id() const { return id; };
 

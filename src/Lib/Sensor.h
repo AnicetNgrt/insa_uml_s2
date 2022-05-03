@@ -8,7 +8,7 @@ using namespace std;
 
 class Sensor : public CSV_Assignable {
 public:
-  Sensor();
+  Sensor() {};
 
   string get_id() const { return id; };
   double get_x() const { return x; };

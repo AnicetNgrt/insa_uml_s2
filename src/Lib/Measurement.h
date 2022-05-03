@@ -18,7 +18,7 @@ MeasurementType measurement_type_from_string(string s);
 
 class Measurement : public CSV_Assignable {
 public:
-  Measurement();
+  Measurement() {};
 
   MeasurementType get_type() const { return type; };
   string get_sensor_id() const { return sensor_id; };

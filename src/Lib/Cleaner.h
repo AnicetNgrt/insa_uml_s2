@@ -9,7 +9,7 @@ using namespace std;
 
 class Cleaner : public CSV_Assignable {
 public:
-  Cleaner();
+  Cleaner() {};
 
   string get_id() const { return id; };
   string get_provider() const { return provider; };

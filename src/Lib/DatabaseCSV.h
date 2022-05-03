@@ -17,7 +17,7 @@ public:
     auto csv_stream = Unwrap(maybe_parser.success_value);
 
     auto receive = [&]() -> Maybe<Data> {
-      Data data();
+      Data data = Data();
       do {
         auto maybe_parsed_row = csv_stream->receive();
         if (maybe_parsed_row.is_absent)
@@ -35,11 +35,13 @@ public:
       return Some(data);
     };
 
-    return new StreamClosure<Data>(receive, [&]() { delete csv_stream; });
+    auto close = [&]() { delete csv_stream; };
+
+    return new StreamClosure<Data>(receive, close);
   }
 
   Stream<Data> *stream() {
-    return filter_and_stream([]() { return true; });
+    return filter_and_stream([](const Data& _) { return true; });
   }
 
 private:

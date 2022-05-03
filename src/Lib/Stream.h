@@ -8,6 +8,8 @@ using namespace std;
 
 template <typename ItemType> class Stream {
 public:
+  virtual ~Stream() {};
+
   virtual Maybe<ItemType> receive() = 0;
 };
 
@@ -19,9 +21,10 @@ public:
   StreamClosure()
       : _receive([]() -> Maybe<ItemType> { return None; }), close([]() {}) {}
 
-  StreamClosure(
-      NextFn receive, CloseFn close = []() {})
+  StreamClosure(NextFn receive, CloseFn close)
       : _receive(receive), close(close) {}
+
+  StreamClosure(NextFn receive) : _receive(receive), close([]() {}) {}
 
   ~StreamClosure() { close(); }
 
