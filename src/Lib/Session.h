@@ -21,7 +21,7 @@ struct Session {
   Database<Measurement> const &measurements_db;
   Database<Sensor> const &sensors_db;
 
-  Maybe<User const *> authed_user;
+  Maybe<User> authed_user;
   unordered_map<string, OwnerFlag> owners_flags;
 };
 
