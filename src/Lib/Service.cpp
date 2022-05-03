@@ -26,6 +26,7 @@ Result<double, const char*> Service::provider_cleaners_efficiency(string provide
 
 void Service::flag_owner(string owner_id, OwnerFlag flag)
 {
+    Database<Owner> ow = new DatabaseCSV("dataset/users.csv");
 }
 
 Maybe<const char*> Service::authenticate(string username, string password)
