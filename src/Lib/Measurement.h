@@ -8,7 +8,10 @@ using namespace std;
 #include "Timestamp.h"
 
 enum class MeasurementType {
-  CO2
+  O3,
+  NO2,
+  SO2,
+  PM10
 };
 
 MeasurementType measurement_type_from_string(string s);
