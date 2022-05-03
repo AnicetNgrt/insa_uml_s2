@@ -1,7 +1,6 @@
 #include "Service.h"
 
 Service::Service(Session &session) : session(session) {
-  this->session = session;
 }
 
 Stream<Measurement> *Service::measurements(string sensor_id,
@@ -42,19 +41,17 @@ void Service::flag_owner(string owner_id, OwnerFlag flag) {
 }
 
 Maybe<const char *> Service::authenticate(string username, string password) {
-
-    Database<User>* db = session.users_db;
+    const Database<User>* db = session.users_db;
     auto filter = [&](const User &user) -> bool {
-        return (user.get_username == username && user.get_password_hash == password);
+        return (user.get_username() == username && user.get_password_hash() == password);
     };
     auto user_stream = db->filter_and_stream(filter);
 
-    Maybe<const char *> maybe_connected = Some("Nom d'utilisateur ou mot de passe incorrect");
-    if(!(maybe_connected = user_stream->receive()).is_absent) {
-        maybe_connected = None;
+    session.authed_user = user_stream->receive(); 
+    if(session.authed_user.is_absent) {
+      return Some("could not authenticate user");
     }
-
-    return maybe_user;
+    return None;
 }
 
 
