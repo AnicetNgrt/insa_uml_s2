@@ -34,5 +34,6 @@ Maybe<const char*> Service::authenticate(string username, string password)
 
 Maybe<User> Service::authenticated_user()
 {
+    return session.authed_user;
 }
 
