@@ -16,7 +16,7 @@ class IService {
 public:
   virtual Stream<Measurement>* measurements() = 0;
   virtual Result<double, const char*> air_quality_area(double x, double y, double rad, Maybe<Timestamp> start, Maybe<Timestamp> end) = 0;
-  virtual Result<double, const char*> air_quality(double x, double y, Timestamp &at);
+  virtual Result<double, const char*> air_quality(double x, double y, Timestamp &at) = 0;
   virtual Stream<Sensor>* similar_sensors(string sensor_id, int n, Maybe<Timestamp> start, Maybe<Timestamp> end) = 0;
   virtual Result<double, const char*> cleaner_efficiency(string cleaner_id) = 0;
   virtual Result<double, const char*> provider_cleaners_efficiency(string provider) = 0;

@@ -1,9 +1,5 @@
 #pragma once
 
-#include <optional>
-
-using namespace std;
-
 template <typename ValueType> struct Maybe {
   ValueType const maybe_value[1];
   bool const is_absent;
