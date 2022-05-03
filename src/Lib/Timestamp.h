@@ -14,3 +14,4 @@ struct Timestamp {
 };
 
 Timestamp timestamp_from_string(string s);
+bool timestamp_equal(Timestamp &t1, Timestamp &t2);
