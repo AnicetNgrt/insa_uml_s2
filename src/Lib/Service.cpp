@@ -1,6 +1,8 @@
 #include "Service.h"
 
-Service::Service(Session &session) : session(session) {}
+Service::Service(Session &session) : session(session) {
+    this->session = session; 
+}
 
 Stream<Measurement> *Service::measurements(string sensor_id,
                                            Maybe<MeasurementType> type,
