@@ -3,10 +3,10 @@
 #include "Maybe.h"
 
 template <typename SuccessType, typename ErrorType> struct Result {
-  Maybe<SuccessType> const success_value;
-  Maybe<ErrorType> const error_value;
-  bool const is_error;
-  bool const is_success;
+  Maybe<SuccessType> success_value;
+  Maybe<ErrorType> error_value;
+  bool is_error;
+  bool is_success;
 };
 
 #define Ok(value)                                                              \

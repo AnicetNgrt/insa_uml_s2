@@ -3,6 +3,8 @@
 #include "CSV.h"
 #include "Database.h"
 
+#include <iostream>
+
 template <typename Data> 
 class DatabaseCSV : public Database<Data> {
 public:
@@ -16,10 +18,11 @@ public:
 
     auto csv_stream = Unwrap(maybe_parser.success_value);
 
-    auto receive = [&]() -> Maybe<Data> {
+    auto receive = [=]() -> Maybe<Data> {
       Data data = Data();
       do {
         auto maybe_parsed_row = csv_stream->receive();
+
         if (maybe_parsed_row.is_absent)
           return None;
         ParsedCSV_Row parsed_row = Unwrap(maybe_parsed_row);
@@ -35,7 +38,7 @@ public:
       return Some(data);
     };
 
-    auto close = [&]() { delete csv_stream; };
+    auto close = [=]() { delete csv_stream; };
 
     return new StreamClosure<Data>(receive, close);
   }

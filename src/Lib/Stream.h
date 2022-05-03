@@ -4,6 +4,8 @@
 #include <functional>
 #include <vector>
 
+#include <iostream>
+
 using namespace std;
 
 template <typename ItemType> class Stream {
@@ -28,7 +30,9 @@ public:
 
   ~StreamClosure() { close(); }
 
-  Maybe<ItemType> receive() override { return _receive(); };
+  Maybe<ItemType> receive() override { 
+    return _receive(); 
+  };
 
 private:
   NextFn const _receive;

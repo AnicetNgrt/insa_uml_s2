@@ -1,8 +1,8 @@
 #pragma once
 
 template <typename ValueType> struct Maybe {
-  ValueType const maybe_value[1];
-  bool const is_absent;
+  ValueType maybe_value[1];
+  bool is_absent;
 };
 
 #define Some(value)                                                            \

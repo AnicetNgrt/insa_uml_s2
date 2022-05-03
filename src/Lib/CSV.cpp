@@ -25,7 +25,7 @@ csv_parser_from_file(string csv_file_path) {
     return Err(CSV_ParseError::HEADER_NOT_READABLE);
   }
 
-  auto receive = [&]() -> Maybe<ParsedCSV_Row> {
+  auto receive = [=]() -> Maybe<ParsedCSV_Row> {
     auto data = unordered_map<string, string>();
 
     string row;
@@ -44,7 +44,7 @@ csv_parser_from_file(string csv_file_path) {
     return Some(Ok(data));
   };
 
-  auto close = [&]() {
+  auto close = [=]() {
     file->close();
     delete file;
     delete rows;
