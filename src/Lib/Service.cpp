@@ -40,10 +40,14 @@ void Service::flag_owner(string owner_id, OwnerFlag flag) {
   }
 }
 
+string hash_password(string password) {
+  return password; // TODO!!!!
+}
+
 Maybe<const char *> Service::authenticate(string username, string password) {
     const Database<User>* db = session.users_db;
     auto filter = [&](const User &user) -> bool {
-        return (user.get_username() == username && user.get_password_hash() == password);
+        return (user.get_username() == username && user.get_password_hash() == hash_password(password));
     };
     auto user_stream = db->filter_and_stream(filter);
 
@@ -53,7 +57,5 @@ Maybe<const char *> Service::authenticate(string username, string password) {
     }
     return None;
 }
-
-
 
 Maybe<User> Service::authenticated_user() { return session.authed_user; }
