@@ -12,7 +12,7 @@
 BIN := uml
 
 # Options de compilation
-OPTIONS := -g -Wall -ansi -pedantic -std=c++17
+OPTIONS := -g -Wall -ansi -pedantic -std=c++11
 
 # Liste des sous-répertoires de src/ contenant des sources à compiler
 # 	nb : Ne pas inclure les répertoires contenant des sources déclarant un main
