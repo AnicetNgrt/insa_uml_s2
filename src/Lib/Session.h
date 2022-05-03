@@ -4,6 +4,7 @@
 
 using namespace std;
 
+#include "Result.h"
 #include "Cleaner.h"
 #include "Database.h"
 #include "Maybe.h"
@@ -25,4 +26,4 @@ struct Session {
   unordered_map<string, OwnerFlag> owners_flags;
 };
 
-Session from_args(const char **argv, size_t argc);
+Result<Session, string> from_args(const char **argv, size_t argc);
