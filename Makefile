@@ -21,6 +21,7 @@ MODULES := Lib
 # Déclaration des chemins des programmes (sans le .cpp)
 MAIN_PROG := Main
 TEST_PROG := Tests
+PERSONAL_PROG := TestsPerso
 
 #-------- [Fin partie customisable] ---------------------------------------------------
 
@@ -68,11 +69,16 @@ build: checkdirs $(BIN)
 
 build_tests: checkdirs $(BIN)_tests
 
+build_perso: checkdirs $(BIN)_perso
+
 run: checkdirs $(BIN)
 	./$(BIN)
 
 test: checkdirs $(BIN)_tests
 	./$(BIN)_tests
+
+perso: checkdirs $(BIN)_perso
+	./$(BIN)_perso
 
 # Cible pour la création de l'exécutable
 $(BIN): $(OBJS) build/$(MAIN_PROG).o
@@ -81,10 +87,16 @@ $(BIN): $(OBJS) build/$(MAIN_PROG).o
 $(BIN)_tests: $(OBJS) build/$(TEST_PROG).o
 	g++ $(OPTIONS) $^ -o $@
 
+$(BIN)_perso: $(OBJS) build/$(PERSONAL_PROG).o
+	g++ $(OPTIONS) $^ -o $@
+
 build/$(MAIN_PROG).o: src/$(MAIN_PROG).cpp
 	g++ $(OPTIONS) -MMD -c $< -o $@
 
 build/$(TEST_PROG).o: src/$(TEST_PROG).cpp
+	g++ $(OPTIONS) -MMD -c $< -o $@
+
+build/$(PERSONAL_PROG).o: src/$(PERSONAL_PROG).cpp
 	g++ $(OPTIONS) -MMD -c $< -o $@
 
 # Cible pour la création des répertoires des objets
