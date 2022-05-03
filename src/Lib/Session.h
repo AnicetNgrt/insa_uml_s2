@@ -7,6 +7,7 @@ using namespace std;
 #include "Result.h"
 #include "Cleaner.h"
 #include "Database.h"
+#include "DatabaseCSV.h"
 #include "Maybe.h"
 #include "Measurement.h"
 #include "Owner.h"
