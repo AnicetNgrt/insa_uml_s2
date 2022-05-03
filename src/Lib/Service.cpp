@@ -1,10 +1,20 @@
 #include "Service.h"
 
-Service::Service(Session &session) : session(session) {}
+Service::Service(Session &session) : session(session) {
+    this->session = session; 
+}
 
 Stream<Measurement> *Service::measurements(string sensor_id,
                                            Maybe<MeasurementType> type,
-                                           Maybe<Timestamp> timestamp) {}
+                                           Maybe<Timestamp> timestamp) {
+    auto filter = [&](const Measurement &m) -> bool {
+    if(type.is_absent || timestamp.is_absent)
+        return false;
+    return (m.get_type() == Unwrap(type) && m.get_sensor_id() == sensor_id && timestamp_equal(m.get_timestamp(),Unwrap(timestamp)));
+    }; 
+
+    return session.measurements_db.filter_and_stream(filter);                                          
+}
 
 Result<double, const char *> Service::air_quality_area(double x, double y,
                                                        double rad,
