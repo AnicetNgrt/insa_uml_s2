@@ -5,8 +5,10 @@
 # - all : appelle build
 # - build : compile le programme principal
 # - build_tests : compile le programme de test
+# - build_perso : compile le programme de test perso
 # - run : compile et lance le programme principal
 # - test : compile et lance le programme de test
+# - perso : compile et lance le programme de test perso
 
 # Chemin vers l'exécutable principal
 BIN := uml
