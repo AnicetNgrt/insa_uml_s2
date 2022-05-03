@@ -10,7 +10,7 @@ class DatabaseCSV : public Database<Data> {
 public:
   DatabaseCSV(string path) : csv_file_path(path) {}
 
-  Stream<Data> *filter_and_stream(function<bool(Data const &)> filter) {
+  Stream<Data> *filter_and_stream(function<bool(Data const &)> filter) const {
     auto maybe_parser = csv_parser_from_file(csv_file_path);
     if (maybe_parser.is_error) {
       return new StreamClosure<Data>();
@@ -43,7 +43,7 @@ public:
     return new StreamClosure<Data>(receive, close);
   }
 
-  Stream<Data> *stream() {
+  Stream<Data> *stream() const {
     return filter_and_stream([](const Data& _) { return true; });
   }
 
