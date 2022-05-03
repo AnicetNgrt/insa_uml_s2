@@ -50,5 +50,5 @@ csv_parser_from_file(string csv_file_path) {
     delete rows;
   };
 
-  return Ok(new Stream<ParsedCSV_Row>(receive, close));
+  return Ok(new StreamClosure<ParsedCSV_Row>(receive, close));
 }

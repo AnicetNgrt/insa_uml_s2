@@ -10,7 +10,7 @@ public:
   Stream<Data> *filter_and_stream(function<bool(Data const &)> filter) {
     auto maybe_parser = csv_parser_from_file(csv_file_path);
     if (maybe_parser.is_error) {
-      return Stream();
+      return new StreamClosure();
     }
 
     auto csv_stream = Unwrap(maybe_parser.success_value);
@@ -34,9 +34,7 @@ public:
       return Some(data);
     };
 
-    auto close = [&]() { delete csv_stream; };
-
-    return new Stream(receive, close);
+    return new StreamClosure(receive, [&]() { delete csv_stream; });
   }
 
   Stream<Data> *stream() {
