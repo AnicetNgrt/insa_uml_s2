@@ -9,7 +9,9 @@ Result<Session, string> from_args(const char **argv, size_t argc)
 	 * -u Spécifie le nom d’utilisateur
 	 * -p Spécifie le mot de passe
 	 ******************************/
-	string username, password;
+	string username = "";
+	string password = "";
+
 	for (int i = 0; i < argc; ++i)
 	{
 		string arg = argv[i];
@@ -22,13 +24,9 @@ Result<Session, string> from_args(const char **argv, size_t argc)
 			password = argv[++i];
 		}
 	}
-	/*
-	 Database<User> const &users_db;
-  Database<Cleaner> const &cleaners_db;
-  Database<Owner> const &owners_db;
-  Database<Measurement> const &measurements_db;
-  Database<Sensor> const &sensors_db;
-	*/
+	
+	if(username.length() == 0 || password.length() == 0)
+		return Err("ERROR: username or password is missing");
 	
 	Session opened_session = {
 		username,
@@ -39,6 +37,7 @@ Result<Session, string> from_args(const char **argv, size_t argc)
 		new DatabaseCSV<Measurement>("dataset/measurements.csv"),
 		new DatabaseCSV<Sensor>("dataset/sensors.csv"),
 		None,
+		unordered_map<string, OwnerFlag>()
 	};
 	return Ok(opened_session);
 }
