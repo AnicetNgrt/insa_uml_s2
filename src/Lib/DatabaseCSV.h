@@ -12,7 +12,7 @@ public:
 
   Stream<Data> *filter_and_stream(function<bool(Data const &)> filter) const {
     auto maybe_parser = csv_parser_from_file(csv_file_path);
-    if (maybe_parser.is_error) {
+    if (failure(maybe_parser)) {
       return new StreamClosure<Data>();
     }
 
@@ -23,10 +23,10 @@ public:
       do {
         auto maybe_parsed_row = csv_stream->receive();
 
-        if (maybe_parsed_row.is_absent)
+        if (none(maybe_parsed_row))
           return None;
         ParsedCSV_Row parsed_row = Unwrap(maybe_parsed_row);
-        if (parsed_row.is_error)
+        if (failure(parsed_row))
           return None;
         CSV_Row row = Unwrap(parsed_row.success_value);
 

@@ -15,7 +15,7 @@ int main() {
   auto user_stream = db->filter_and_stream(filter);
 
   Maybe<User> maybe_user = None;
-  while(!(maybe_user = user_stream->receive()).is_absent) {
+  while(some((maybe_user = user_stream->receive()))) {
     User user = Unwrap(maybe_user);
     cout << user.get_username() << endl;
   }

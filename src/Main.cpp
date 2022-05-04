@@ -8,7 +8,7 @@ using namespace std;
 
 int main(int argc, const char *argv[]) {
     Result<Session, string> session_parsing_result = from_args(argv, argc);
-    if (session_parsing_result.is_error) {
+    if (failure(session_parsing_result)) {
         cout << "ERROR: " << Unwrap(session_parsing_result.error_value) << endl;
         exit(EXIT_FAILURE);
     }
@@ -17,7 +17,7 @@ int main(int argc, const char *argv[]) {
     Service service = Service(session);
 
     Maybe<const char*> maybe_error = service.authenticate(session.username, session.password);
-    if (!maybe_error.is_absent) {
+    if (some(maybe_error)) {
         cout << "ERROR: " << Unwrap(maybe_error) << endl; 
         exit(EXIT_FAILURE);
     }
@@ -28,9 +28,9 @@ int main(int argc, const char *argv[]) {
     while(true) {
         cin >> command;
         Result<string, string> message = interpreter.interpret(command);
-        if (message.is_error) {
+        if (failure(message)) {
             cout << "ERROR: " << Unwrap(message.error_value) << endl;
-        } else {
+        } else if (success(message)) {
             cout << Unwrap(message.success_value) << endl;
         }
     }
