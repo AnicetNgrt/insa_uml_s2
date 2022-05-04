@@ -4,15 +4,15 @@
 
 using namespace std;
 
-#include "Result.h"
 #include "IService.h"
+#include "Result.h"
 #include "Session.h"
 
 class Interpreter {
 public:
-  Interpreter(IService &service);
-  Result<string, string> interpret(string command) const;
+    Interpreter(IService& service);
+    Result<string, string> interpret(string command) const;
 
 private:
-  IService &service;
+    IService& service;
 };
