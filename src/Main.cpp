@@ -2,11 +2,12 @@
 
 using namespace std;
 
-#include "Lib/Result.h"
 #include "Lib/Interpreter.h"
+#include "Lib/Result.h"
 #include "Lib/Service.h"
 
-int main(int argc, const char *argv[]) {
+int main(int argc, const char* argv[])
+{
     Result<Session, string> session_parsing_result = from_args(argv, argc);
     if (failure(session_parsing_result)) {
         cout << "ERROR: " << Unwrap(session_parsing_result.error_value) << endl;
@@ -18,14 +19,14 @@ int main(int argc, const char *argv[]) {
 
     Maybe<const char*> maybe_error = service.authenticate(session.username, session.password);
     if (some(maybe_error)) {
-        cout << "ERROR: " << Unwrap(maybe_error) << endl; 
+        cout << "ERROR: " << Unwrap(maybe_error) << endl;
         exit(EXIT_FAILURE);
     }
 
     Interpreter interpreter = Interpreter(service);
 
     string command;
-    while(true) {
+    while (true) {
         cin >> command;
         Result<string, string> message = interpreter.interpret(command);
         if (failure(message)) {
