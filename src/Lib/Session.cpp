@@ -17,16 +17,21 @@ Result<Session, string> from_args(const char **argv, size_t argc)
 		string arg = argv[i];
 		if (arg == "-u")
 		{
+			if (i+1 > argc || argv[i+1][0] == '-') return Err("username is missing");
 			username = argv[++i];
 		}
 		else if (arg == "-p")
 		{
+			if (i+1 > argc || argv[i+1][0] == '-') return Err("password is missing");
 			password = argv[++i];
 		}
 	}
 	
-	if(username.length() == 0 || password.length() == 0)
-		return Err("ERROR: username or password is missing");
+	if(username.length() == 0)
+		return Err("username is missing");
+	
+	if(password.length() == 0)
+		return Err("password is missing");
 	
 	Session opened_session = {
 		username,
