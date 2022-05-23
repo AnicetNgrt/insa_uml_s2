@@ -14,9 +14,8 @@ enum class CSV_ParseError { SOURCE_NOT_READABLE,
     HEADER_NOT_READABLE };
 
 typedef unordered_map<string, string> CSV_Row;
-typedef Result<CSV_Row, CSV_ParseError> ParsedCSV_Row;
 
-Result<Stream<ParsedCSV_Row>*, CSV_ParseError>
+Result<Stream<CSV_Row>*, CSV_ParseError>
 csv_parser_from_file(string csv_file_path);
 
 class CSV_Assignable {

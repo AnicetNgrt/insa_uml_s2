@@ -10,6 +10,8 @@ struct Result {
 
 #define success(result) some(result.success_value)
 #define failure(result) some(result.error_value)
+#define UnwrapValue(result) Unwrap(result.success_value)
+#define UnwrapError(result) Unwrap(result.error_value)
 #define Ok(value)         \
     {                     \
         Some(value), None \

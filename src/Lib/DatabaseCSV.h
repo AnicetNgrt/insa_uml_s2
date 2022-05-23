@@ -20,19 +20,16 @@ public:
             return new StreamClosure<Data>();
         }
 
-        auto csv_stream = Unwrap(maybe_parser.success_value);
+        auto csv_stream = UnwrapValue(maybe_parser);
 
         auto receive = [=]() -> Maybe<Data> {
             Data data = Data();
             do {
-                auto maybe_parsed_row = csv_stream->receive();
+                auto maybe_row = csv_stream->receive();
 
-                if (none(maybe_parsed_row))
+                if (none(maybe_row))
                     return None;
-                ParsedCSV_Row parsed_row = Unwrap(maybe_parsed_row);
-                if (failure(parsed_row))
-                    return None;
-                CSV_Row row = Unwrap(parsed_row.success_value);
+                CSV_Row row = Unwrap(maybe_row);
 
                 bool success = data.assign_from_csv(row);
                 if (!success)

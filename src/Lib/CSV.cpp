@@ -2,7 +2,7 @@
 
 #include "CSV.h"
 
-Result<Stream<ParsedCSV_Row>*, CSV_ParseError>
+Result<Stream<CSV_Row>*, CSV_ParseError>
 csv_parser_from_file(string csv_file_path)
 {
     auto file = new ifstream(csv_file_path);
@@ -26,7 +26,7 @@ csv_parser_from_file(string csv_file_path)
         return Err(CSV_ParseError::HEADER_NOT_READABLE);
     }
 
-    auto receive = [=]() -> Maybe<ParsedCSV_Row> {
+    auto receive = [=]() -> Maybe<CSV_Row> {
         auto data = unordered_map<string, string>();
 
         string row;
@@ -42,7 +42,7 @@ csv_parser_from_file(string csv_file_path)
             return None;
         }
 
-        return Some(Ok(data));
+        return Some(data);
     };
 
     auto close = [=]() {
@@ -51,5 +51,5 @@ csv_parser_from_file(string csv_file_path)
         delete rows;
     };
 
-    return Ok(new StreamClosure<ParsedCSV_Row>(receive, close));
+    return Ok(new StreamClosure<CSV_Row>(receive, close));
 }

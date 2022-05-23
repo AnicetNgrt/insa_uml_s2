@@ -24,7 +24,8 @@ Stream<Measurement>* Service::measurements(string sensor_id,
 Result<double, const char*> Service::air_quality_area(double x, double y,
     double rad,
     Maybe<Timestamp> start,
-    Maybe<Timestamp> end) { }
+    Maybe<Timestamp> end) {
+}
 
 Stream<Sensor>* Service::similar_sensors(string sensor_id, int n,
     Maybe<Timestamp> start,

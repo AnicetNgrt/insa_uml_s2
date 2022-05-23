@@ -30,9 +30,9 @@ int main(int argc, const char* argv[])
         cin >> command;
         Result<string, string> message = interpreter.interpret(command);
         if (failure(message)) {
-            cout << "ERROR: " << Unwrap(message.error_value) << endl;
+            cout << "ERROR: " << UnwrapError(message) << endl;
         } else if (success(message)) {
-            cout << Unwrap(message.success_value) << endl;
+            cout << UnwrapValue(message) << endl;
         }
     }
 }
