@@ -62,7 +62,7 @@ Maybe<const char*> Service::authenticate(string username, string password)
 
     session.authed_user = user_stream->receive();
     if (some(session.authed_user)) {
-        return Some("could not authenticate user");
+        return Some("Could not authenticate user");
     }
     return None;
 }

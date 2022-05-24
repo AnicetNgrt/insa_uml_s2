@@ -10,11 +10,11 @@ int main(int argc, const char* argv[])
 {
     Result<Session, string> session_parsing_result = from_args(argv, argc);
     if (failure(session_parsing_result)) {
-        cout << "ERROR: " << Unwrap(session_parsing_result.error_value) << endl;
+        cout << "ERROR: " << UnwrapError(session_parsing_result) << endl;
         exit(EXIT_FAILURE);
     }
 
-    Session session = Unwrap(session_parsing_result.success_value);
+    Session session = UnwrapValue(session_parsing_result);
     Service service = Service(session);
 
     Maybe<const char*> maybe_error = service.authenticate(session.username, session.password);

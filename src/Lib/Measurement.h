@@ -25,6 +25,8 @@ public:
     double get_value() const { return value; };
     Timestamp const& get_timestamp() const { return timestamp; };
 
+    string to_string() const;
+
     bool assign_from_csv(CSV_Row const& csv_row) override
     {
         CSV_TRY_ASSIGN_DOUBLE(value, "value")
