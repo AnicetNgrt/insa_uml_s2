@@ -36,7 +36,7 @@ Result<string, ArgError> Command::find_arg(string arg_name) const
 
 function<string(ArgError)> arg_error_to_string(string arg_name, string friendly_name)
 {
-    return function([=](ArgError e) -> string {
+    return [=](ArgError e) -> string {
         switch (e) {
         case ArgError::ARG_NOT_FOUND:
             return friendly_name + " (argument " + arg_name + ") was not found";
@@ -45,7 +45,7 @@ function<string(ArgError)> arg_error_to_string(string arg_name, string friendly_
         case ArgError::VALUE_NOT_PARSABLE:
             return friendly_name + " (argument " + arg_name + ") had an invalid value";
         }
-    });
+    };
 }
 
 static double double_from_string(string s)

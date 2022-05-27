@@ -1,9 +1,7 @@
 #include <sstream>
 #include <unordered_map>
 
-#include "Command.h"
 #include "Interpreter.h"
-#include "Measurement.h"
 
 auto MANUAL = R"(
 Utilisation générale: airwatcher [ options ... ]

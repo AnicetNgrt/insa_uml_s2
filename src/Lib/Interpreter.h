@@ -7,6 +7,7 @@ using namespace std;
 #include "IService.h"
 #include "Result.h"
 #include "Session.h"
+#include "Command.h"
 
 class Interpreter {
 public:

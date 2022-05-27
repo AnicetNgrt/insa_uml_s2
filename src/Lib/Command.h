@@ -30,7 +30,7 @@ public:
 
 private:
     template <typename T>
-    Result<T, ArgError> Command::find_arg(string arg_name, T (*conversion)(string)) const
+    Result<T, ArgError> find_arg(string arg_name, T (*conversion)(string)) const
     {
         Result<string, ArgError> arg = find_arg(arg_name);
         try {
