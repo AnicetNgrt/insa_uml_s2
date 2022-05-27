@@ -45,9 +45,3 @@ private:
 };
 
 function<string(ArgError)> arg_error_to_string(string arg, string friendly_name);
-
-template <typename T>
-Result<string, string> map_arg_error_to_message(Result<T, ArgError> erronous_result, string arg_name, string friendly_name)
-{
-    return map_error(erronous_result, arg_error_to_string(arg_name, friendly_name));
-}
