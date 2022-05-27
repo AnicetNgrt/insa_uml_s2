@@ -3,6 +3,7 @@
 
 #include "Measurement.h"
 #include "Interpreter.h"
+#include "Command.h"
 
 auto MANUAL = R"(
 Utilisation générale: airwatcher [ options ... ]
@@ -52,64 +53,6 @@ Classifier un utilisateur comme “fiable” ou “peu fiable”
 
 Interpreter::Interpreter(IService& service) : service(service) {}
 
-enum class ArgError {
-    ARG_NOT_FOUND,
-    VALUE_NOT_FOUND,
-    VALUE_NOT_PARSABLE
-};
-
-function<string (ArgError)> map_arg_error_to_string(string arg, string friendly_name) {
-    return function([=] (ArgError e) -> string {
-        switch(e) {
-            case ArgError::ARG_NOT_FOUND: return friendly_name + " (argument " + arg + ") was not found";
-            case ArgError::VALUE_NOT_FOUND: return friendly_name + " (argument " + arg + ") had no value given";
-            case ArgError::VALUE_NOT_PARSABLE: return friendly_name + " (argument " + arg + ") had an invalid value";
-        }
-    });
-}
-
-Result<string, ArgError> cmd_find_arg(vector<string> args, string name) {
-    bool prev_is_arg;
-    for (size_t i = 0; i < args.size(); i++) {
-        if (args[i] == name) {
-            prev_is_arg = true;
-        }
-        if (prev_is_arg) {
-            if (args[i][0] == '-' && !atoi(args[i].c_str())) {
-                return Err(ArgError::VALUE_NOT_FOUND);
-            } else {
-                return Ok(args[i]);
-            }
-        }
-    }
-    return Err(ArgError::ARG_NOT_FOUND);
-}
-
-template<typename T>
-Result<T, ArgError> cmd_find_arg(vector<string> args, string name, T (*conversion)(string)) {
-    Result<string, ArgError> maybe_arg = cmd_find_arg(args, name);
-    try {
-        return map_success(maybe_arg, conversion);
-    } catch (exception e) {
-        return Err(ArgError::VALUE_NOT_PARSABLE);
-    }
-}
-
-pair<string, vector<string>> cmd_name_and_args(string command) {
-    vector<string> args();
-    istringstream iss(command);
-    string cname;
-    getline(iss, cname, ' ' );
-    if (iss.good()) {
-        string s;
-        while (getline( iss, s, ' ' )) {
-            printf( "`%s'\n", s.c_str() );
-        }
-    }
-
-    make_pair(cname, args);
-}
-
 Result<string, string> cmd_exit() {
     exit(EXIT_SUCCESS);
     return Ok("");
@@ -119,11 +62,11 @@ Result<string, string> cmd_help() {
     return Ok(MANUAL);
 }
 
-Result<string, string> cmd_reconnect(vector<string> args, IService& service) {
-    auto username = cmd_find_arg(args, "-u");
-    auto password = cmd_find_arg(args, "-p");
-    if (failure(username)) return map_error(username, map_arg_error_to_string("-u", "Username"));
-    if (failure(password)) return map_error(password, map_arg_error_to_string("-p", "Password"));
+Result<string, string> cmd_reconnect(Command& cmd, IService& service) {
+    auto username = cmd.find_arg("-u");
+    auto password = cmd.find_arg("-p");
+    if (failure(username)) return map_arg_error_to_message(username, "-u", "Username");
+    if (failure(password)) return map_arg_error_to_message(password, "-p", "Password");
 
     auto maybe_error = service.authenticate(UnwrapValue(username), UnwrapValue(password));
     if (some(maybe_error)) return Err(Unwrap(maybe_error));
@@ -132,62 +75,58 @@ Result<string, string> cmd_reconnect(vector<string> args, IService& service) {
     return Ok("Connected as " + user.get_username());
 }
 
-Result<string, string> cmd_measurements(vector<string> args, IService& service) {
-    auto id = cmd_find_arg(args, "-s");
-    if (failure(id)) return map_error(id, map_arg_error_to_string("-s", "Sensor id"));
+Result<string, string> cmd_measurements(Command& cmd, IService& service) {
+    auto id = cmd.find_arg("-s");
+    if (failure(id)) return map_arg_error_to_message(id, "-s", "Sensor id");
 
-    auto time = cmd_find_arg(args, "-ts", &timestamp_from_string);
-    if (is_error(time, ArgError::VALUE_NOT_PARSABLE)) {
-        return map_error(time, map_arg_error_to_string("-ts", "Timestamp"));
-    }
-    auto type = cmd_find_arg(args, "-t", &measurement_type_from_string);
-    if (is_error(type, ArgError::VALUE_NOT_PARSABLE)) {
-        return map_error(type, map_arg_error_to_string("-t", "Measurement type"));
-    }
+    auto time = cmd.find_timestamp("-ts");
+    if (is_error(time, ArgError::VALUE_NOT_PARSABLE)) return map_arg_error_to_message(time, "-ts", "Timestamp");
+    auto type = cmd.find_measurement_type("-t");
+    if (is_error(type, ArgError::VALUE_NOT_PARSABLE)) return map_arg_error_to_message(type, "-t", "Measurement type");
 
     auto measurements = service.measurements(UnwrapValue(id), to_maybe(type), to_maybe(time));
     stringstream formatted;
 
-    Maybe<Measurement> maybe_m = None;
-    while(some((maybe_m = measurements->receive()))) {
-        Measurement m = Unwrap(maybe_m);
-        formatted << m.to_string();
+    Maybe<Measurement> measurement = measurements->receive();
+    while(some(measurement)) {
+        formatted << Unwrap(measurement).to_string();
+        measurement = measurements->receive();
     }
     return Ok(formatted.str());
 }
 
-Result<string, string> cmd_quality_area(vector<string> args, IService& service) {
-    auto maybe_lt = cmd_find_arg_double(args, "-lt");
-    if (none(maybe_lt)) return Err("Latitude missing");
-    auto maybe_lg = cmd_find_arg_double(args, "-lg");
-    if (none(maybe_lg)) return Err("Longitude missing");
-    auto maybe_rad = cmd_find_arg_double(args, "-rad");
-    if (none(maybe_rad)) return Err("Radius missing");
+Result<string, string> cmd_quality_area(Command& cmd, IService& service) {
+    auto lt = cmd.find_double("-lt");
+    if (failure(lt)) return map_arg_error_to_message(lt, "-lt", "Latitude");
+    auto lg = cmd.find_double("-lg");
+    if (failure(lg)) return map_arg_error_to_message(lt, "-lg", "Longitude");
+    auto rad = cmd.find_double("-rad");
+    if (failure(rad)) return map_arg_error_to_message(lt, "-rad", "Radius");
 
-    auto maybe_start = cmd_find_arg_timestamp(args, "-begin");
-    auto maybe_end = cmd_find_arg_timestamp(args, "-end");
+    auto start = cmd.find_timestamp("-begin");
+    if (is_error(start, ArgError::VALUE_NOT_PARSABLE)) return map_arg_error_to_message(start, "-begin", "Beginning timestamp");
+    auto end = cmd.find_timestamp("-end");
+    if (is_error(end, ArgError::VALUE_NOT_PARSABLE)) return map_arg_error_to_message(end, "-end", "End timestamp");
 
-    auto result = service.air_quality_area(Unwrap(maybe_lt), Unwrap(maybe_lg), Unwrap(maybe_rad), maybe_start, maybe_start);
-    if (success(result)) {
-        auto quality_area = UnwrapValue(result);
+    auto quality_area = service.air_quality_area(UnwrapValue(lt), UnwrapValue(lg), UnwrapValue(rad), to_maybe(start), to_maybe(end));
+    
+    auto quality_area_to_message = [&] (double quality_area) -> string {
         stringstream formatted;
-        formatted << "Qualité de l'air en (" << Unwrap(maybe_lg) << "," << Unwrap(maybe_lt) << ") dans un rayon de " << Unwrap(maybe_rad) << " : " << quality_area;
-        return Ok(formatted.str());
-    } else {
-        return Err(UnwrapError(result));
-    }
+        formatted << "Qualité de l'air en (" << UnwrapValue(lg) << "," << UnwrapValue(lt) << ") dans un rayon de " << UnwrapValue(rad) << " : " << quality_area;
+        return formatted.str();
+    };
+
+    return map_success(quality_area, quality_area_to_message);
 }
 
-Result<string, string> cmd_flag_owner(vector<string> args, IService& service) {
-    auto maybe_id = cmd_find_arg(args, "-u");
-    if (none(maybe_id)) return Err("Owner id missing");
+Result<string, string> cmd_flag_owner(Command& cmd, IService& service) {
+    auto id = cmd.find_arg("-u");
 
 }
 
 Result<string, string> Interpreter::interpret(string command) const {
-    auto name_and_args = cmd_name_and_args(command);
-    auto name = name_and_args.first;
-    auto args = name_and_args.second;
+    Command c = Command(command);
+    string name = c.get_name();
 
     if (name == "exit") {
         cmd_exit();
