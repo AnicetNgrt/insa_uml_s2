@@ -24,3 +24,5 @@ private:
 
 enum class OwnerFlag { RELIABLE,
     UNRELIABLE };
+
+OwnerFlag owner_flag_from_string(string s);

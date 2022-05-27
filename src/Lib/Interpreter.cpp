@@ -52,7 +52,23 @@ Classifier un utilisateur comme “fiable” ou “peu fiable”
 
 Interpreter::Interpreter(IService& service) : service(service) {}
 
-Maybe<string> cmd_find_arg_string(vector<string> args, string name) {
+enum class ArgError {
+    ARG_NOT_FOUND,
+    VALUE_NOT_FOUND,
+    VALUE_NOT_PARSABLE
+};
+
+function<string (ArgError)> map_arg_error_to_string(string arg, string friendly_name) {
+    return function([=] (ArgError e) -> string {
+        switch(e) {
+            case ArgError::ARG_NOT_FOUND: return friendly_name + " (argument " + arg + ") was not found";
+            case ArgError::VALUE_NOT_FOUND: return friendly_name + " (argument " + arg + ") had no value given";
+            case ArgError::VALUE_NOT_PARSABLE: return friendly_name + " (argument " + arg + ") had an invalid value";
+        }
+    });
+}
+
+Result<string, ArgError> cmd_find_arg(vector<string> args, string name) {
     bool prev_is_arg;
     for (size_t i = 0; i < args.size(); i++) {
         if (args[i] == name) {
@@ -60,38 +76,22 @@ Maybe<string> cmd_find_arg_string(vector<string> args, string name) {
         }
         if (prev_is_arg) {
             if (args[i][0] == '-' && !atoi(args[i].c_str())) {
-                return None;
+                return Err(ArgError::VALUE_NOT_FOUND);
             } else {
-                return Some(args[i]);
+                return Ok(args[i]);
             }
         }
     }
-    return None;
+    return Err(ArgError::ARG_NOT_FOUND);
 }
 
-Maybe<Timestamp> cmd_find_arg_timestamp(vector<string> args, string name) {
-    auto maybe_arg = cmd_find_arg_string(args, name);
-    if (none(maybe_arg)) return None;
-    return Some(timestamp_from_string(Unwrap(maybe_arg)));
-}
-
-Maybe<MeasurementType> cmd_find_arg_measurement_type(vector<string> args, string name) {
-    auto maybe_arg = cmd_find_arg_string(args, name);
-    if (none(maybe_arg)) return None;
+template<typename T>
+Result<T, ArgError> cmd_find_arg(vector<string> args, string name, T (*conversion)(string)) {
+    Result<string, ArgError> maybe_arg = cmd_find_arg(args, name);
     try {
-        return Some(measurement_type_from_string(Unwrap(maybe_arg)));
-    } catch(exception _) {
-        return None;
-    }
-}
-
-Maybe<double> cmd_find_arg_double(vector<string> args, string name) {
-    auto maybe_arg = cmd_find_arg_string(args, name);
-    if (none(maybe_arg)) return None;
-    try {
-        return Some(atof(Unwrap(maybe_arg).c_str()));
-    } catch(exception _) {
-        return None;
+        return map_success(maybe_arg, conversion);
+    } catch (exception e) {
+        return Err(ArgError::VALUE_NOT_PARSABLE);
     }
 }
 
@@ -120,12 +120,12 @@ Result<string, string> cmd_help() {
 }
 
 Result<string, string> cmd_reconnect(vector<string> args, IService& service) {
-    auto maybe_username = cmd_find_arg_string(args, "-u");
-    auto maybe_password = cmd_find_arg_string(args, "-p");
-    if (none(maybe_password)) return Err("Password missing");
-    if (none(maybe_username)) return Err("Username missing");
+    auto username = cmd_find_arg(args, "-u");
+    auto password = cmd_find_arg(args, "-p");
+    if (failure(username)) return map_error(username, map_arg_error_to_string("-u", "Username"));
+    if (failure(password)) return map_error(password, map_arg_error_to_string("-p", "Password"));
 
-    auto maybe_error = service.authenticate(Unwrap(maybe_username), Unwrap(maybe_password));
+    auto maybe_error = service.authenticate(UnwrapValue(username), UnwrapValue(password));
     if (some(maybe_error)) return Err(Unwrap(maybe_error));
 
     auto user = Unwrap(service.authenticated_user()); // Should not be None here. If it is, crashing is better.
@@ -133,13 +133,19 @@ Result<string, string> cmd_reconnect(vector<string> args, IService& service) {
 }
 
 Result<string, string> cmd_measurements(vector<string> args, IService& service) {
-    auto maybe_id = cmd_find_arg_string(args, "-s");
-    if (none(maybe_id)) return Err("Sensor id missing");
+    auto id = cmd_find_arg(args, "-s");
+    if (failure(id)) return map_error(id, map_arg_error_to_string("-s", "Sensor id"));
 
-    auto maybe_time = cmd_find_arg_timestamp(args, "-ts");
-    auto maybe_type = cmd_find_arg_measurement_type(args, "-t");
+    auto time = cmd_find_arg(args, "-ts", &timestamp_from_string);
+    if (is_error(time, ArgError::VALUE_NOT_PARSABLE)) {
+        return map_error(time, map_arg_error_to_string("-ts", "Timestamp"));
+    }
+    auto type = cmd_find_arg(args, "-t", &measurement_type_from_string);
+    if (is_error(type, ArgError::VALUE_NOT_PARSABLE)) {
+        return map_error(type, map_arg_error_to_string("-t", "Measurement type"));
+    }
 
-    auto measurements = service.measurements(Unwrap(maybe_id), maybe_type, maybe_time);
+    auto measurements = service.measurements(UnwrapValue(id), to_maybe(type), to_maybe(time));
     stringstream formatted;
 
     Maybe<Measurement> maybe_m = None;
@@ -170,6 +176,12 @@ Result<string, string> cmd_quality_area(vector<string> args, IService& service) 
     } else {
         return Err(UnwrapError(result));
     }
+}
+
+Result<string, string> cmd_flag_owner(vector<string> args, IService& service) {
+    auto maybe_id = cmd_find_arg(args, "-u");
+    if (none(maybe_id)) return Err("Owner id missing");
+
 }
 
 Result<string, string> Interpreter::interpret(string command) const {
