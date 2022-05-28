@@ -27,8 +27,8 @@ string Measurement::to_string() const {
         case MeasurementType::SO2: formatted << "SO2"; break;
     }
     Timestamp t = get_timestamp();
-    formatted << " " << t.day << "/" << t.month << "/" << t.year << ":" << t.hour << ":" << t.minute << ":" << t.second;
-    formatted << " " << get_value() << endl;
+    formatted << " " << timestamp_to_string(t);
+    formatted << " " << get_value();
 
     return formatted.str();
 }

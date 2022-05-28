@@ -17,6 +17,29 @@ public:
 };
 
 template <typename ItemType>
+class StreamVector : public Stream<ItemType> {
+public:
+    StreamVector(vector<ItemType> v)
+        : v(v)
+        , i(0)
+    {
+    }
+
+    Maybe<ItemType> receive() override
+    {
+        if (i < v.size()) {
+            return Some(v[i++]);
+        } else {
+            return None;
+        }
+    };
+
+private:
+    vector<ItemType> v;
+    size_t i;
+};
+
+template <typename ItemType>
 class StreamClosure : public Stream<ItemType> {
 public:
     typedef function<Maybe<ItemType>()> NextFn;

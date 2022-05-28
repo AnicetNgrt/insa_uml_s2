@@ -19,6 +19,11 @@ MeasurementType measurement_type_from_string(string s);
 class Measurement : public CSV_Assignable {
 public:
     Measurement() {};
+    Measurement(MeasurementType type, string sensor_id, double value, Timestamp timestamp)
+        : type(type)
+        , sensor_id(sensor_id)
+        , value(value)
+        , timestamp(timestamp) {};
 
     MeasurementType get_type() const { return type; };
     string get_sensor_id() const { return sensor_id; };

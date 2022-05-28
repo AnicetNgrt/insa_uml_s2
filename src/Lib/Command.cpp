@@ -20,15 +20,15 @@ Result<string, ArgError> Command::find_arg(string arg_name) const
 {
     bool prev_is_arg;
     for (size_t i = 0; i < args.size(); i++) {
-        if (args[i] == arg_name) {
-            prev_is_arg = true;
-        }
         if (prev_is_arg) {
             if (args[i][0] == '-' && !atoi(args[i].c_str())) {
                 return Err(ArgError::VALUE_NOT_FOUND);
             } else {
                 return Ok(args[i]);
             }
+        }
+        if (args[i] == arg_name) {
+            prev_is_arg = true;
         }
     }
     return Err(ArgError::ARG_NOT_FOUND);

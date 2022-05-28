@@ -26,16 +26,16 @@ Se déconnecter et fermer l’application
     exit
 
 Afficher une liste de mesures en fonction de filtres 
-    measurements -ts [horodatage (JJ:MM:AAAA::HH) (optionnel)] -t [type (optionnel)] -s [sensor ID]
+    measurements -ts [horodatage (YYYY-MM-DD HH:MM:SS) (optionnel)] -t [type (optionnel)] -s [sensor ID]
 
 Afficher la qualité de l’air moyen dans une zone donnée pendant une période donnée
-    quality-area -begin [horodatage début (JJ:MM:AAAA:HH) (optionnel)] -end [horodatage fin (JJ:MM:AAAA:HH) (optionnel)] -lt [latitude] -lg [longitude] -rad [rayon]
+    quality-area -begin [horodatage début (YYYY-MM-DD HH:MM:SS) (optionnel)] -end [horodatage fin (YYYY-MM-DD HH:MM:SS) (optionnel)] -lt [latitude] -lg [longitude] -rad [rayon]
 
 Afficher la qualité de l’air à un point donné à un moment donné
-    quality-point -t [horodatage (JJ:MM:AAAA:HH)] -cx [coordonnée X] -cy [coordonnée Y]
+    quality-point -t [horodatage (YYYY-MM-DD HH:MM:SS)] -cx [coordonnée X] -cy [coordonnée Y]
 
 Afficher les capteurs les plus similaires à un capteur donné pendant une période donnée
-    sensors-matching -s [sensor ID] -begin [horodatage début (JJ:MM:AAAA:HH) (optionnel)] -end [horodatage fin (JJ:MM:AAAA:HH) (optionnel)]
+    sensors-matching -s [sensor ID] -begin [horodatage début (YYYY-MM-DD HH:MM:SS) (optionnel)] -end [horodatage fin (YYYY-MM-DD HH:MM:SS) (optionnel)]
 
 Commandes disponibles pour les comptes d’entreprises:
 
@@ -66,8 +66,11 @@ Result<string, string> Interpreter::interpret(string command) const
         cmd_exit();
         return Ok();
     }
-    if (name == "help") {
+    if (name == "measurements") {
+        return cmd_measurements(c);
     }
+
+    return Err("No corresponding command was found");
 }
 
 Result<string, string> Interpreter::cmd_exit() const
@@ -103,7 +106,7 @@ Result<string, string> Interpreter::cmd_measurements(Command& cmd) const
     auto id = cmd.find_arg("-s");
     if (failure(id))
         return map_arg_error_to_message(id, "-s", "Sensor id");
-
+    
     auto time = cmd.find_timestamp("-ts");
     if (is_error(time, ArgError::VALUE_NOT_PARSABLE))
         return map_arg_error_to_message(time, "-ts", "Timestamp");
@@ -112,11 +115,11 @@ Result<string, string> Interpreter::cmd_measurements(Command& cmd) const
         return map_arg_error_to_message(type, "-t", "Measurement type");
 
     auto measurements = service.measurements(UnwrapValue(id), to_maybe(type), to_maybe(time));
+    
     stringstream formatted;
-
     Maybe<Measurement> measurement = measurements->receive();
     while (some(measurement)) {
-        formatted << Unwrap(measurement).to_string();
+        formatted << Unwrap(measurement).to_string() << endl;
         measurement = measurements->receive();
     }
     return Ok(formatted.str());
@@ -143,13 +146,17 @@ Result<string, string> Interpreter::cmd_quality_area(Command& cmd) const
 
     auto quality_area = service.air_quality_area(UnwrapValue(lt), UnwrapValue(lg), UnwrapValue(rad), to_maybe(start), to_maybe(end));
 
-    auto quality_area_to_message = [&](double quality_area) -> string {
+    auto quality_area_to_message = [&](double quality_area) {
         stringstream formatted;
-        formatted << "Qualité de l'air en (" << UnwrapValue(lg) << "," << UnwrapValue(lt) << ") dans un rayon de " << UnwrapValue(rad) << " : " << quality_area;
+        formatted << "Air quality at (" << UnwrapValue(lg) << "," << UnwrapValue(lt) << ") with radius " << UnwrapValue(rad) << " : " << quality_area;
         return formatted.str();
     };
 
-    return map_success(quality_area, quality_area_to_message);
+    if (success(quality_area)) {
+        return map_success(quality_area, quality_area_to_message);
+    } else {
+        return err_from(quality_area);
+    }
 }
 
 Result<string, string> Interpreter::cmd_flag_owner(Command& cmd) const

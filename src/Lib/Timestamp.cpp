@@ -1,6 +1,24 @@
 #include <sstream>
+#include <iomanip>
 
 #include "Timestamp.h"
+
+string timestamp_to_string(Timestamp const& t)
+{
+    stringstream formatted;
+    formatted << setfill('0') << setw(4) << t.year;
+    formatted << "-";
+    formatted << setfill('0') << setw(2) << t.month;
+    formatted << "-";
+    formatted << setfill('0') << setw(2) << t.day;
+    formatted << " ";
+    formatted << setfill('0') << setw(2) << t.hour;
+    formatted << ":";
+    formatted << setfill('0') << setw(2) << t.minute;
+    formatted << ":";
+    formatted << setfill('0') << setw(2) << t.second;
+    return formatted.str();
+}
 
 Timestamp timestamp_from_string(string s)
 {

@@ -27,6 +27,11 @@ Result<double, const char*> Service::air_quality_area(double x, double y,
     Maybe<Timestamp> end) {
 }
 
+Result<double, const char*> Service::air_quality(double x, double y,
+    Timestamp& at) {
+
+}
+
 Stream<Sensor>* Service::similar_sensors(string sensor_id, int n,
     Maybe<Timestamp> start,
     Maybe<Timestamp> end) { }

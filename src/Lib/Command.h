@@ -34,8 +34,14 @@ private:
     {
         Result<string, ArgError> arg = find_arg(arg_name);
         try {
-            return map_success(arg, conversion);
-        } catch (exception e) {
+            if (success(arg)) {
+                return map_success(arg, conversion);
+            } else {
+                return err_from(arg);
+            }
+        } catch (const std::out_of_range& e) {
+            return Err(ArgError::VALUE_NOT_PARSABLE);
+        } catch (const std::invalid_argument& e) {
             return Err(ArgError::VALUE_NOT_PARSABLE);
         }
     }
