@@ -10,7 +10,8 @@ Stream<Measurement>* MockService::measurements(string sensor_id,
     vector<Measurement> measurements = {
         Measurement(MeasurementType::NO2, "A", 1, timestamp_from_string("2016-02-03 12:00:00")),
         Measurement(MeasurementType::PM10, "A", 1, timestamp_from_string("2016-02-03 13:00:00")),
-        Measurement(MeasurementType::NO2, "A", 1, timestamp_from_string("2016-02-03 14:00:00"))
+        Measurement(MeasurementType::NO2, "A", 1, timestamp_from_string("2016-02-03 14:00:00")),
+        Measurement(MeasurementType::O3, "Z", 1, timestamp_from_string("2016-02-03 14:00:00"))
     };
     return new StreamVector<Measurement>(measurements);
 }

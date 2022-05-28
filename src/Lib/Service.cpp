@@ -9,12 +9,12 @@ Stream<Measurement>* Service::measurements(string sensor_id,
     Maybe<MeasurementType> type_filter,
     Maybe<Timestamp> timestamp_filter)
 {
-    auto filter = [&](const Measurement& m) -> bool {
+    auto filter = [=](const Measurement& m) -> bool {
         bool type_good = some(type_filter) ? m.get_type() == Unwrap(type_filter) : true;
         bool timestamp_good = some(timestamp_filter)
             ? timestamp_equal(m.get_timestamp(), Unwrap(timestamp_filter))
             : true;
-        bool sensor_good = m.get_sensor_id() == sensor_id;
+        bool sensor_good = m.get_sensor_id().compare(sensor_id) == 0;
         return type_good && timestamp_good && sensor_good;
     };
 

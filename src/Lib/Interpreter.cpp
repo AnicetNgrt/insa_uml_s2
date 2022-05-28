@@ -110,6 +110,7 @@ Result<string, string> Interpreter::cmd_measurements(Command& cmd) const
     auto time = cmd.find_timestamp("-ts");
     if (is_error(time, ArgError::VALUE_NOT_PARSABLE))
         return map_arg_error_to_message(time, "-ts", "Timestamp");
+    
     auto type = cmd.find_measurement_type("-t");
     if (is_error(type, ArgError::VALUE_NOT_PARSABLE))
         return map_arg_error_to_message(type, "-t", "Measurement type");
