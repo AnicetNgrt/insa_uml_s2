@@ -72,6 +72,9 @@ int timestamp_compare(Timestamp const& t1, Timestamp const& t2) {
     if (t1.day > t2.day) return 1;
     if (t1.day < t2.day) return -1;
 
+    if (t1.hour > t2.hour) return 1;
+    if (t1.hour < t2.hour) return -1;
+
     if (t1.minute > t2.minute) return 1;
     if (t1.minute < t2.minute) return -1;
 
