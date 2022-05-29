@@ -104,18 +104,18 @@ Result<string, string> Interpreter::cmd_reconnect(Command& cmd) const
 Result<string, string> Interpreter::cmd_measurements(Command& cmd) const
 {
     auto id = cmd.find_arg("-s");
-    if (failure(id))
+    if (failure(id) && !is_error(id, ArgError::ARG_NOT_FOUND))
         return map_arg_error_to_message(id, "-s", "Sensor id");
     
     auto time = cmd.find_timestamp("-ts");
-    if (is_error(time, ArgError::VALUE_NOT_PARSABLE))
+    if (failure(time) && !is_error(time, ArgError::ARG_NOT_FOUND))
         return map_arg_error_to_message(time, "-ts", "Timestamp");
     
     auto type = cmd.find_measurement_type("-t");
-    if (is_error(type, ArgError::VALUE_NOT_PARSABLE))
+    if (failure(type) && !is_error(type, ArgError::ARG_NOT_FOUND))
         return map_arg_error_to_message(type, "-t", "Measurement type");
 
-    auto measurements = service.measurements(UnwrapValue(id), to_maybe(type), to_maybe(time));
+    auto measurements = service.measurements(to_maybe(id), to_maybe(type), to_maybe(time));
     
     stringstream formatted;
     Maybe<Measurement> measurement = measurements->receive();

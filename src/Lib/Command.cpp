@@ -2,16 +2,49 @@
 
 #include "Command.h"
 
+static double double_from_string(string s);
+
 Command::Command(string command)
-    : name()
+    : name("")
     , args()
 {
-    istringstream iss(command);
-    getline(iss, name, ' ');
-    if (iss.good()) {
-        string s;
-        while (getline(iss, s, ' ')) {
-            args.push_back(s);
+    char buffer[1024];
+    size_t len = 0;
+    char quote = 0;
+    
+    for (size_t i = 0; i < command.size(); i++) {
+        char c = command.at(i);
+        if (c == '\'' || c == '"') {
+            if (quote == 0) {
+                quote = c;
+            } else {
+                if (name.size() == 0) {
+                    name = string(buffer, len);
+                } else {
+                    args.push_back(string(buffer, len));
+                }
+                len = 0;
+                quote = 0;
+            }
+        } else if (c == ' ' && quote == 0 && len > 0) {
+            if (name.size() == 0) {
+                name = string(buffer, len);
+            } else {
+                args.push_back(string(buffer, len));
+            }
+            len = 0;
+        } else if (c == ' ' && quote == 0 && len <= 0) {
+            continue;
+        } else {
+            buffer[len++] = c;
+        }
+    }
+
+    if (len > 0) {
+        if (name.size() == 0) {
+            name = string(buffer, len);
+        } else {
+            args.push_back(string(buffer, len));
         }
     }
 }
@@ -31,7 +64,34 @@ Result<string, ArgError> Command::find_arg(string arg_name) const
             prev_is_arg = true;
         }
     }
-    return Err(ArgError::ARG_NOT_FOUND);
+    if (prev_is_arg) {
+        return Err(ArgError::VALUE_NOT_FOUND);
+    } else {
+        return Err(ArgError::ARG_NOT_FOUND);
+    }
+}
+
+string Command::get_name() const {
+    return name;
+}
+
+Args const& Command::get_args() const {
+    return args;
+}
+
+Result<Timestamp, ArgError> Command::find_timestamp(string arg_name) const
+{
+    return find_arg(arg_name, &timestamp_from_string);
+}
+
+Result<MeasurementType, ArgError> Command::find_measurement_type(string arg_name) const
+{
+    return find_arg(arg_name, &measurement_type_from_string);
+}
+
+Result<double, ArgError> Command::find_double(string arg_name) const
+{
+    return find_arg(arg_name, &double_from_string);
 }
 
 function<string(ArgError)> arg_error_to_string(string arg_name, string friendly_name)
@@ -50,24 +110,5 @@ function<string(ArgError)> arg_error_to_string(string arg_name, string friendly_
 
 static double double_from_string(string s)
 {
-    return atof(s.c_str());
-}
-
-string Command::get_name() const {
-    return name;
-}
-
-Result<Timestamp, ArgError> Command::find_timestamp(string arg_name) const
-{
-    return find_arg(arg_name, &timestamp_from_string);
-}
-
-Result<MeasurementType, ArgError> Command::find_measurement_type(string arg_name) const
-{
-    return find_arg(arg_name, &measurement_type_from_string);
-}
-
-Result<double, ArgError> Command::find_double(string arg_name) const
-{
-    return find_arg(arg_name, &double_from_string);
+    return stod(s);
 }

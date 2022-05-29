@@ -3,7 +3,7 @@
 MockService::MockService() {
 }
 
-Stream<Measurement>* MockService::measurements(string sensor_id,
+Stream<Measurement>* MockService::measurements(Maybe<string> sensor_id_filter,
     Maybe<MeasurementType> type_filter,
     Maybe<Timestamp> timestamp_filter)
 {

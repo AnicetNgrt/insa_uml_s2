@@ -27,6 +27,7 @@ public:
     Result<double, ArgError> find_double(string arg_name) const;
     
     string get_name() const;
+    Args const& get_args() const;
 
 private:
     template <typename T>

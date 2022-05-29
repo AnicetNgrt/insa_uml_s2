@@ -6,7 +6,7 @@ class MockService : public IService {
 public:
     MockService();
 
-    Stream<Measurement>* measurements(string sensor_id,
+    Stream<Measurement>* measurements(Maybe<string> sensor_id_filter,
         Maybe<MeasurementType> type_filter,
         Maybe<Timestamp> timestamp_filter) override;
     Result<double, const char*> air_quality_area(double x, double y, double rad,

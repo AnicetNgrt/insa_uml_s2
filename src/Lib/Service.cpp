@@ -5,7 +5,7 @@ Service::Service(Session& session)
 {
 }
 
-Stream<Measurement>* Service::measurements(string sensor_id,
+Stream<Measurement>* Service::measurements(Maybe<string> sensor_id_filter,
     Maybe<MeasurementType> type_filter,
     Maybe<Timestamp> timestamp_filter)
 {
@@ -14,7 +14,7 @@ Stream<Measurement>* Service::measurements(string sensor_id,
         bool timestamp_good = some(timestamp_filter)
             ? timestamp_equal(m.get_timestamp(), Unwrap(timestamp_filter))
             : true;
-        bool sensor_good = m.get_sensor_id().compare(sensor_id) == 0;
+        bool sensor_good = some(sensor_id_filter) ? m.get_sensor_id().compare(Unwrap(sensor_id_filter)) == 0 : true;
         return type_good && timestamp_good && sensor_good;
     };
 
