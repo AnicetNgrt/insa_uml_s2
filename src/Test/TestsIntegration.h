@@ -3,7 +3,7 @@
 #include "../Dependencies/microtest.h"
 #include "./MockSession.h"
 
-TEST(cmd_measurement_filter_by_sensor_id)
+TEST(integ_cmd_measurement_filter_by_sensor_id)
 {   
     auto measurements = new MockDatabase<Measurement>({
         Measurement(MeasurementType::NO2, "A", 1, timestamp_from_string("2016-02-03 12:00:00")),
@@ -34,7 +34,7 @@ Z O3 2016-02-03 14:00:00 1
 )");
 }
 
-TEST(cmd_measurement_filter_by_timestamp)
+TEST(integ_cmd_measurement_filter_by_timestamp)
 {
     auto measurements = new MockDatabase<Measurement>({
         Measurement(MeasurementType::NO2, "A", 1, timestamp_from_string("2016-02-03 12:00:00")),
@@ -58,7 +58,7 @@ Z O3 2016-02-03 14:00:00 1
 )");
 }
 
-TEST(cmd_measurement_filter_by_type)
+TEST(integ_cmd_measurement_filter_by_type)
 {
     auto measurements = new MockDatabase<Measurement>({
         Measurement(MeasurementType::NO2, "A", 1, timestamp_from_string("2016-02-03 12:00:00")),
@@ -80,4 +80,28 @@ TEST(cmd_measurement_filter_by_type)
 A NO2 2016-02-03 12:00:00 1
 A NO2 2016-02-03 14:00:00 1
 )");
+}
+
+TEST(integ_cmd_reconnect)
+{
+    auto users = new MockDatabase<User>({
+        User("Mik", default_password_hasher("1313"), UserPermissionLevel::BASIC),
+        User("Mike", default_password_hasher("12345"), UserPermissionLevel::BASIC),
+        User("Mikey", default_password_hasher("310731"), UserPermissionLevel::GOVERNMENT)
+    });
+    Session session = mock_session(users, 0, 0, 0, 0);
+    Service s = Service(session);
+    Interpreter i = Interpreter(s);
+
+    auto res = i.interpret("reconnect -u Mike -p 12345");
+    ASSERT(success(res));
+    ASSERT_STREQ(UnwrapValue(res), "Connected as Mike");
+
+    res = i.interpret("reconnect -u Patrick -p 12345");
+    ASSERT(failure(res));
+    ASSERT_STREQ(UnwrapError(res), "User Patrick was not found");
+
+    res = i.interpret("reconnect -u Mike -p 54321");
+    ASSERT(failure(res));
+    ASSERT_STREQ(UnwrapError(res), "Incorrect password for user Mike");
 }

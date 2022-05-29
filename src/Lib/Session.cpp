@@ -14,7 +14,7 @@ Result<Session, string> from_args(const char** argv, size_t argc)
     string password = "";
     string dataset_dir = "./dataset";
 
-    for (int i = 0; i < argc; ++i) {
+    for (size_t i = 0; i < argc; ++i) {
         string arg = argv[i];
         if (arg == "-u") {
             if (i + 1 > argc || argv[i + 1][0] == '-')

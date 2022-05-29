@@ -65,9 +65,10 @@ Result<string, string> Interpreter::interpret(string command) const
     if (name == "exit") {
         cmd_exit();
         return Ok();
-    }
-    if (name == "measurements") {
+    } else if (name == "measurements") {
         return cmd_measurements(c);
+    } else if (name == "reconnect") {
+        return cmd_reconnect(c);
     }
 
     return Err("No corresponding command was found");
@@ -94,8 +95,12 @@ Result<string, string> Interpreter::cmd_reconnect(Command& cmd) const
         return map_arg_error_to_message(password, "-p", "Password");
 
     auto maybe_error = service.authenticate(UnwrapValue(username), UnwrapValue(password));
-    if (some(maybe_error))
-        return Err(Unwrap(maybe_error));
+    if (some(maybe_error)) {
+        switch(Unwrap(maybe_error)) {
+            case AuthError::USER_NOT_FOUND: return Err("User " + UnwrapValue(username) + " was not found");
+            case AuthError::WRONG_PASSWORD: return Err("Incorrect password for user " + UnwrapValue(username));
+        }
+    }
 
     auto user = Unwrap(service.authenticated_user()); // Should not be None here. If it is, crashing is better.
     return Ok("Connected as " + user.get_username());

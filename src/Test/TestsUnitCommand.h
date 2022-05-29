@@ -3,7 +3,7 @@
 #include "../Dependencies/microtest.h"
 #include "../Lib/Command.h"
 
-TEST(command_expected_name_and_args)
+TEST(unit_command_expected_name_and_args)
 {
     Command c = Command("bidule -o truc -p machin");
 
@@ -21,7 +21,7 @@ TEST(command_expected_name_and_args)
     ASSERT_EQ(expected_args.size(), args.size());
 }
 
-TEST(command_expected_name_and_args_with_quotes)
+TEST(unit_command_expected_name_and_args_with_quotes)
 {
     Command c = Command("bidule -o truc -p \"machin chouette\" -k okay --p \'voili voilou\'");
 
@@ -39,7 +39,7 @@ TEST(command_expected_name_and_args_with_quotes)
     ASSERT_EQ(expected_args.size(), args.size());
 }
 
-TEST(command_find_args_string)
+TEST(unit_command_find_args_string)
 {
     Command c = Command("bidule -o truc -p \"machin chouette\" -k okay --p \'voili voilou\' -l");
 
@@ -68,7 +68,7 @@ TEST(command_find_args_string)
     ASSERT((UnwrapError(res) == ArgError::VALUE_NOT_FOUND));
 }
 
-TEST(command_find_args_double)
+TEST(unit_command_find_args_double)
 {
     Command c = Command("bidule -x AAAA -y 18.373");
 
@@ -81,7 +81,7 @@ TEST(command_find_args_double)
     ASSERT_EQ(UnwrapValue(res), 18.373);
 }
 
-TEST(command_find_args_timestamp)
+TEST(unit_command_find_args_timestamp)
 {
     Command c = Command("bidule -t1 AAAA -t2 '2019-04-05 18:32:53'");
 

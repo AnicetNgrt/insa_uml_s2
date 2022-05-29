@@ -1,7 +1,7 @@
 #include "Service.h"
 
-Service::Service(Session& session)
-    : session(session)
+Service::Service(Session& session, string(*password_hasher)(string))
+    : session(session), password_hasher(password_hasher)
 {
 }
 
@@ -21,13 +21,13 @@ Stream<Measurement>* Service::measurements(Maybe<string> sensor_id_filter,
     return session.measurements_db->filter_and_stream(filter);
 }
 
-Result<double, const char*> Service::air_quality_area(double x, double y,
+Result<double, string> Service::air_quality_area(double x, double y,
     double rad,
     Maybe<Timestamp> start,
     Maybe<Timestamp> end) {
 }
 
-Result<double, const char*> Service::air_quality(double x, double y,
+Result<double, string> Service::air_quality(double x, double y,
     Timestamp& at) {
 
 }
@@ -36,9 +36,9 @@ Stream<Sensor>* Service::similar_sensors(string sensor_id, int n,
     Maybe<Timestamp> start,
     Maybe<Timestamp> end) { }
 
-Result<double, const char*> Service::cleaner_efficiency(string cleaner_id) { }
+Result<double, string> Service::cleaner_efficiency(string cleaner_id) { }
 
-Result<double, const char*> Service::provider_cleaners_efficiency(
+Result<double, string> Service::provider_cleaners_efficiency(
     string provider) { }
 
 void Service::flag_owner(string owner_id, OwnerFlag flag)
@@ -52,22 +52,36 @@ void Service::flag_owner(string owner_id, OwnerFlag flag)
     }
 }
 
-string hash_password(string password)
+string default_password_hasher(string password)
 {
-    return password; // TODO!!!!
+    // Obviously this is for demonstration purposes
+    // In production, please link a proper cryptographic hashing & salting implementation
+    // that has been thoroughly tested and used by industry projects before.
+    return password;
 }
 
-Maybe<const char*> Service::authenticate(string username, string password)
+Maybe<AuthError> Service::authenticate(string username, string password)
 {
     const Database<User>* db = session.users_db;
+    bool user_found = false;
     auto filter = [&](const User& user) -> bool {
-        return (user.get_username() == username && user.get_password_hash() == hash_password(password));
+        if (user.get_username().compare(username) == 0) {
+            user_found = true;
+            if (user.get_password_hash().compare(password_hasher(password)) == 0) {
+                return true;
+            }
+        }
+        return false;
     };
     auto user_stream = db->filter_and_stream(filter);
 
     session.authed_user = user_stream->receive();
-    if (some(session.authed_user)) {
-        return Some("Could not authenticate user");
+    if (none(session.authed_user)) {
+        if (user_found) {
+            return Some(AuthError::WRONG_PASSWORD);
+        } else {
+            return Some(AuthError::USER_NOT_FOUND);
+        }
     }
     return None;
 }

@@ -14,6 +14,7 @@ UserPermissionLevel user_permission_level_from_string(string s);
 class User : public CSV_Assignable {
 public:
     User() {};
+    User(string username, string password_hash, UserPermissionLevel permission_level);
 
     string get_password_hash() const { return password_hash; };
     string get_username() const { return username; };

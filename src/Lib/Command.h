@@ -47,8 +47,8 @@ private:
         }
     }
 
-    Args args;
     string name;
+    Args args;
 };
 
 function<string(ArgError)> arg_error_to_string(string arg, string friendly_name);
