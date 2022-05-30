@@ -6,11 +6,11 @@ using namespace std;
 
 #include "Cleaner.h"
 #include "Command.h"
-#include "Database.h"
-#include "Maybe.h"
+#include "../Utils/Database.h"
+#include "../Utils/Maybe.h"
 #include "Measurement.h"
 #include "Owner.h"
-#include "Result.h"
+#include "../Utils/Result.h"
 #include "Sensor.h"
 #include "User.h"
 

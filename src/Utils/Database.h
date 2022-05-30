@@ -5,7 +5,7 @@
 
 using namespace std;
 
-#include "Stream.h"
+#include "../Utils/Stream.h"
 
 template <typename Data>
 class Database {

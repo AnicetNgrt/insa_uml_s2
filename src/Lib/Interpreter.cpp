@@ -59,10 +59,13 @@ Result<string, string> Interpreter::interpret(string command) const
     string name = c.get_name();
 
     if (name == "exit") {
-        cmd_exit();
-        return Ok();
+        return cmd_exit();
+    } else if (name == "help") {
+        return cmd_help();
     } else if (name == "measurements") {
         return cmd_measurements(c);
+    } else if (name == "quality-area") {
+        return cmd_quality_area(c);
     } else if (name == "login") {
         return cmd_login(c);
     } else if (name == "flag-owner") {

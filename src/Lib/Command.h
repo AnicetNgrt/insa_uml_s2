@@ -5,8 +5,8 @@
 
 #include "./Measurement.h"
 #include "./Owner.h"
-#include "./Result.h"
-#include "./Timestamp.h"
+#include "../Utils/Result.h"
+#include "../Utils/Timestamp.h"
 
 using namespace std;
 

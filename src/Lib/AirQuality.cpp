@@ -1,6 +1,6 @@
 #include "AirQuality.h"
 
-AirQuality air_quality_compute(Stream<Measurement>& measurements)
+AirQuality air_quality_compute(Stream<Measurement>* measurements)
 {
     unordered_map<MeasurementType, pair<double, int>> averages;
     auto calculate_average = [](pair<double, int> data) -> double {
@@ -8,7 +8,7 @@ AirQuality air_quality_compute(Stream<Measurement>& measurements)
     };
 
     Maybe<Measurement> maybe_m = None;
-    while (some((maybe_m = measurements.receive()))) {
+    while (some((maybe_m = measurements->receive()))) {
         Measurement m = Unwrap(maybe_m);
         auto avg = averages[m.get_type()];
         avg.first += m.get_value(); // add to cumulated value

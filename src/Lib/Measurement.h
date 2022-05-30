@@ -4,8 +4,8 @@
 
 using namespace std;
 
-#include "CSV.h"
-#include "Timestamp.h"
+#include "../Utils/CSV.h"
+#include "../Utils/Timestamp.h"
 #include "MeasurementType.h"
 
 class Measurement : public CSV_Assignable {

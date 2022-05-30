@@ -3,7 +3,7 @@
 using namespace std;
 
 #include "Lib/Interpreter.h"
-#include "Lib/Result.h"
+#include "Utils/Result.h"
 #include "Lib/Service.h"
 
 int main(int argc, const char* argv[])
@@ -24,7 +24,7 @@ int main(int argc, const char* argv[])
 
     string command;
     while (true) {
-        cin >> command;
+        getline(cin, command);
         Result<string, string> message = interpreter.interpret(command);
         if (failure(message)) {
             cout << "ERROR: " << UnwrapError(message) << endl;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Lib/Database.h"
+#include "../Utils/Database.h"
 
 template <typename Data>
 class MockDatabase : public Database<Data> {

@@ -6,10 +6,10 @@ using namespace std;
 
 #include "Measurement.h"
 #include "Owner.h"
-#include "Result.h"
+#include "../Utils/Result.h"
 #include "Sensor.h"
-#include "Stream.h"
-#include "Timestamp.h"
+#include "../Utils/Stream.h"
+#include "../Utils/Timestamp.h"
 #include "User.h"
 #include "AirQuality.h"
 

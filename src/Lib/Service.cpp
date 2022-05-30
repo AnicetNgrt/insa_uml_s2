@@ -3,7 +3,7 @@
 Service::Service(Session& session, PasswordHasher password_hasher, AirQualityComputer air_quality_computer)
     : session(session)
     , password_hasher(password_hasher)
-
+    , air_quality_computer(air_quality_computer)
 {
 }
 
@@ -68,7 +68,7 @@ Result<AirQuality, string> Service::air_quality_area(double x, double y,
     };
 
     auto measurements_stream = session.measurements_db->filter_and_stream(filter_measurements);
-    AirQuality quality = air_quality_computer(*measurements_stream);
+    AirQuality quality = air_quality_computer(measurements_stream);
     delete measurements_stream;
 
     return Ok(quality);

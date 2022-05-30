@@ -11,14 +11,14 @@
 # - perso : compile et lance le programme de test perso
 
 # Chemin vers l'exécutable principal
-BIN := uml
+BIN := airwatcher
 
 # Options de compilation
 OPTIONS := -g -Wall -ansi -pedantic -std=c++11
 
 # Liste des sous-répertoires de src/ contenant des sources à compiler
 # 	nb : Ne pas inclure les répertoires contenant des sources déclarant un main
-MODULES := Lib Test
+MODULES := Lib Test Utils Dependencies
 
 # Déclaration des chemins des programmes (sans le .cpp)
 MAIN_PROG := Main

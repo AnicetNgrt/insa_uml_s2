@@ -4,7 +4,7 @@
 #include <unordered_map>
 
 #include "Measurement.h"
-#include "Stream.h"
+#include "../Utils/Stream.h"
 
 using namespace std;
 
@@ -18,7 +18,7 @@ enum class AirQuality {
     HAZARDOUS
 };
 
-typedef AirQuality (*AirQualityComputer)(Stream<Measurement>&);
+typedef AirQuality (*AirQualityComputer)(Stream<Measurement>*);
 
-AirQuality air_quality_compute(Stream<Measurement>& measurements);
+AirQuality air_quality_compute(Stream<Measurement>* measurements);
 string air_quality_to_string(AirQuality air_quality);

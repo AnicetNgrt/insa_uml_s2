@@ -31,6 +31,6 @@ public:
 
 private:
     Session& session;
-    string (*password_hasher)(string);
-    AirQuality (*air_quality_computer)(Stream<Measurement>&);
+    PasswordHasher password_hasher;
+    AirQualityComputer air_quality_computer;
 };
