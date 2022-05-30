@@ -3,19 +3,20 @@
 #include "IService.h"
 #include "Session.h"
 
+typedef string (*PasswordHasher)(string);
 string default_password_hasher(string);
 
 class Service : public IService {
 public:
-    Service(Session& session, string(*password_hasher)(string) = &default_password_hasher);
+    Service(Session& session, PasswordHasher password_hasher = &default_password_hasher, AirQualityComputer air_quality_computer = &air_quality_compute);
 
     Stream<Measurement>* measurements(Maybe<string> sensor_id_filter,
         Maybe<MeasurementType> type_filter,
         Maybe<Timestamp> timestamp_filter) override;
-    Result<double, string> air_quality_area(double x, double y, double rad,
+    Result<AirQuality, string> air_quality_area(double x, double y, double rad,
         Maybe<Timestamp> start,
         Maybe<Timestamp> end) override;
-    Result<double, string> air_quality(double x, double y,
+    Result<AirQuality, string> air_quality(double x, double y,
         Timestamp& at) override;
     Stream<Sensor>* similar_sensors(string sensor_id, int n,
         Maybe<Timestamp> start,
@@ -30,5 +31,6 @@ public:
 
 private:
     Session& session;
-    string(*password_hasher)(string);
+    string (*password_hasher)(string);
+    AirQuality (*air_quality_computer)(Stream<Measurement>&);
 };

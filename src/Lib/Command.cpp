@@ -11,7 +11,7 @@ Command::Command(string command)
     char buffer[1024];
     size_t len = 0;
     char quote = 0;
-    
+
     for (size_t i = 0; i < command.size(); i++) {
         char c = command.at(i);
         if (c == '\'' || c == '"') {
@@ -49,6 +49,17 @@ Command::Command(string command)
     }
 }
 
+Command::Command(const char** argv, size_t argc)
+    : name("")
+    , args()
+{
+    if (argc >= 1)
+        name = argv[0];
+    for (size_t i = 1; i < argc; i++) {
+        args.push_back(argv[i]);
+    }
+}
+
 Result<string, ArgError> Command::find_arg(string arg_name) const
 {
     bool prev_is_arg;
@@ -71,11 +82,13 @@ Result<string, ArgError> Command::find_arg(string arg_name) const
     }
 }
 
-string Command::get_name() const {
+string Command::get_name() const
+{
     return name;
 }
 
-Args const& Command::get_args() const {
+Args const& Command::get_args() const
+{
     return args;
 }
 

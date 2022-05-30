@@ -8,7 +8,8 @@ using namespace std;
 
 int main(int argc, const char* argv[])
 {
-    Result<Session, string> session_parsing_result = from_args(argv, argc);
+    Command cmd = Command(argv, argc);
+    Result<Session, string> session_parsing_result = from_command(cmd);
     if (failure(session_parsing_result)) {
         cout << "ERROR: " << UnwrapError(session_parsing_result) << endl;
         exit(EXIT_FAILURE);
@@ -18,6 +19,8 @@ int main(int argc, const char* argv[])
     Service service = Service(session);
 
     Interpreter interpreter = Interpreter(service);
+
+    cout << "Type \"help\" to display user manual." << endl;
 
     string command;
     while (true) {

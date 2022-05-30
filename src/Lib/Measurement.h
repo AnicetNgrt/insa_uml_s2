@@ -6,15 +6,7 @@ using namespace std;
 
 #include "CSV.h"
 #include "Timestamp.h"
-
-enum class MeasurementType {
-    O3,
-    NO2,
-    SO2,
-    PM10
-};
-
-MeasurementType measurement_type_from_string(string s);
+#include "MeasurementType.h"
 
 class Measurement : public CSV_Assignable {
 public:

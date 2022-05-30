@@ -13,8 +13,6 @@ Session mock_session(Database<User>* users, Database<Cleaner>* cleaners, Databas
     if (sensors == nullptr)
         sensors = new MockDatabase<Sensor>({});
     return {
-        "mock_username",
-        "mock_password",
         users,
         cleaners,
         owners,

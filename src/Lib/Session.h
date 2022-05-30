@@ -5,6 +5,7 @@
 using namespace std;
 
 #include "Cleaner.h"
+#include "Command.h"
 #include "Database.h"
 #include "Maybe.h"
 #include "Measurement.h"
@@ -14,8 +15,6 @@ using namespace std;
 #include "User.h"
 
 struct Session {
-    string const username;
-    string const password;
     Database<User> const* users_db;
     Database<Cleaner> const* cleaners_db;
     Database<Owner> const* owners_db;
@@ -28,4 +27,4 @@ struct Session {
 
 void end_session(Session& session);
 
-Result<Session, string> from_args(const char** argv, size_t argc);
+Result<Session, string> from_command(Command& cmd);

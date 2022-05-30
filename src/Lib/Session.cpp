@@ -2,44 +2,15 @@
 
 #include "DatabaseCSV.h"
 
-Result<Session, string> from_args(const char** argv, size_t argc)
+Result<Session, string> from_command(Command& cmd)
 {
-    /*****************************
-	 * -h Affiche ce manuel (pas important ici)
-	 * -u Spécifie le nom d’utilisateur
-	 * -p Spécifie le mot de passe
-	 * -d Spécifie le répertoire du dataset (./dataset par défaut)
-	 ******************************/
-    string username = "";
-    string password = "";
-    string dataset_dir = "./dataset";
+    auto maybe_dataset_dir = cmd.find_arg("-d");
+    if (failure(maybe_dataset_dir) && !is_error(maybe_dataset_dir, ArgError::ARG_NOT_FOUND))
+        return map_error(maybe_dataset_dir, arg_error_to_string("-d", "Dataset directory"));
 
-    for (size_t i = 0; i < argc; ++i) {
-        string arg = argv[i];
-        if (arg == "-u") {
-            if (i + 1 > argc || argv[i + 1][0] == '-')
-                return Err("username is missing");
-            username = argv[++i];
-        } else if (arg == "-p") {
-            if (i + 1 > argc || argv[i + 1][0] == '-')
-                return Err("password is missing");
-            password = argv[++i];
-        } else if (arg == "-d") {
-            if (i + 1 > argc || argv[i + 1][0] == '-')
-                return Err("dataset directory path is missing");
-            dataset_dir = argv[++i];
-        }
-    }
-
-    if (username.length() == 0)
-        return Err("username is missing");
-
-    if (password.length() == 0)
-        return Err("password is missing");
+    auto dataset_dir = failure(maybe_dataset_dir) ? "./dataset/" : UnwrapValue(maybe_dataset_dir);
 
     Session opened_session = {
-        username,
-        password,
         new DatabaseCSV<User>(dataset_dir + "/users.csv"),
         new DatabaseCSV<Cleaner>(dataset_dir + "/cleaners.csv"),
         new DatabaseCSV<Owner>(dataset_dir + "/providers.csv"),

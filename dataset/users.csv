@@ -1,2 +1,3 @@
-User0;Sensor70;
-User1;Sensor36;
+username;password hash;permission level;
+User0;1234;basic
+User1;1234;government

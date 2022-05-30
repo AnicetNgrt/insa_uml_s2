@@ -4,9 +4,9 @@
 #include <string>
 
 #include "./Measurement.h"
+#include "./Owner.h"
 #include "./Result.h"
 #include "./Timestamp.h"
-#include "./Owner.h"
 
 using namespace std;
 
@@ -21,13 +21,14 @@ typedef vector<string> Args;
 class Command {
 public:
     Command(string command);
+    Command(const char** argv, size_t argc);
 
     Result<string, ArgError> find_arg(string arg_name) const;
     Result<Timestamp, ArgError> find_timestamp(string arg_name) const;
     Result<MeasurementType, ArgError> find_measurement_type(string arg_name) const;
     Result<OwnerFlag, ArgError> find_owner_flag(string arg_name) const;
     Result<double, ArgError> find_double(string arg_name) const;
-    
+
     string get_name() const;
     Args const& get_args() const;
 

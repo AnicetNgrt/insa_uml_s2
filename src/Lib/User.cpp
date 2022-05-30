@@ -13,5 +13,5 @@ UserPermissionLevel user_permission_level_from_string(string s)
         return UserPermissionLevel::BASIC;
     if (s.compare("government") == 0)
         return UserPermissionLevel::GOVERNMENT;
-    throw std::invalid_argument("no enum member could be parsed");
+    throw invalid_argument("no enum member could be parsed");
 }
