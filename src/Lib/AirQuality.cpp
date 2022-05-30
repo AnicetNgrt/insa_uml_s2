@@ -25,19 +25,15 @@ AirQuality air_quality_compute(Stream<Measurement>* measurements)
     }
 
     auto avg = averages[MeasurementType::NO2];
-    cout << (avg.total / (double)avg.count) << endl;
     double avg_no2 = avg.count != 0 ?  ((avg.total / (double)avg.count) - 45)*15 : 0;
     
     avg = averages[MeasurementType::O3];
-        cout << (avg.total / (double)avg.count) << endl;
     double avg_o3 = avg.count != 0 ? ((avg.total / (double)avg.count) - 49)*15 : 0;
 
     avg = averages[MeasurementType::PM10];
-        cout << (avg.total / (double)avg.count) << endl;
     double avg_pm10 = avg.count != 0 ? ((avg.total / (double)avg.count) - 53)*15 : 0;
 
-    avg = averages[MeasurementType::SO2];
-        cout << (avg.total / (double)avg.count) << endl;  
+    avg = averages[MeasurementType::SO2]; 
     double avg_so2 = avg.count != 0 ? ((avg.total / (double)avg.count) - 50)*15 : 0;
 
     // https://www.libelium.com/wp-content/uploads/2021/04/AQI-USA-Table.png
