@@ -1,8 +1,16 @@
 #include "AirQuality.h"
 
+typedef struct { double total; int count; } AverageData;
+
 AirQuality air_quality_compute(Stream<Measurement>* measurements)
 {
-    unordered_map<MeasurementType, pair<double, int>> averages;
+    unordered_map<MeasurementType, AverageData> averages = {
+        { MeasurementType::NO2, { 0.0, 0 } },
+        { MeasurementType::O3, { 0.0, 0 } },
+        { MeasurementType::PM10, { 0.0, 0 } },
+        { MeasurementType::SO2, { 0.0, 0 } }
+    };
+
     auto calculate_average = [](pair<double, int> data) -> double {
         return data.second != 0 ? data.first / (double)data.second : 0;
     };
@@ -11,23 +19,22 @@ AirQuality air_quality_compute(Stream<Measurement>* measurements)
     while (some((maybe_m = measurements->receive()))) {
         Measurement m = Unwrap(maybe_m);
         auto avg = averages[m.get_type()];
-        avg.first += m.get_value(); // add to cumulated value
-        avg.second += 1; // add to count
+        avg.total += m.get_value();
+        avg.count += 1;
         averages[m.get_type()] = avg;
     }
 
-    if (averages.find(MeasurementType::NO2) == averages.end())
-        averages[MeasurementType::NO2] = make_pair(0.0, 0);
-    double avg_no2 = calculate_average(averages[MeasurementType::NO2]);
-    if (averages.find(MeasurementType::O3) == averages.end())
-        averages[MeasurementType::O3] = make_pair(0.0, 0);
-    double avg_o3 = calculate_average(averages[MeasurementType::O3]);
-    if (averages.find(MeasurementType::PM10) == averages.end())
-        averages[MeasurementType::PM10] = make_pair(0.0, 0);
-    double avg_pm10 = calculate_average(averages[MeasurementType::PM10]);
-    if (averages.find(MeasurementType::SO2) == averages.end())
-        averages[MeasurementType::SO2] = make_pair(0.0, 0);
-    double avg_so2 = calculate_average(averages[MeasurementType::SO2]);
+    auto avg = averages[MeasurementType::NO2];
+    double avg_no2 = avg.count != 0 ? avg.total / (double)avg.count : 0;
+    
+    avg = averages[MeasurementType::O3];
+    double avg_o3 = avg.count != 0 ? avg.total / (double)avg.count : 0;
+
+    avg = averages[MeasurementType::PM10];
+    double avg_pm10 = avg.count != 0 ? avg.total / (double)avg.count : 0;
+
+    avg = averages[MeasurementType::SO2];  
+    double avg_so2 = avg.count != 0 ? avg.total / (double)avg.count : 0;
 
     // https://www.libelium.com/wp-content/uploads/2021/04/AQI-USA-Table.png
     if (avg_no2 > 1250 || avg_o3 > 405 || avg_pm10 > 425 || avg_so2 > 605)
