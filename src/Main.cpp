@@ -17,12 +17,6 @@ int main(int argc, const char* argv[])
     Session session = UnwrapValue(session_parsing_result);
     Service service = Service(session);
 
-    Maybe<const char*> maybe_error = service.authenticate(session.username, session.password);
-    if (some(maybe_error)) {
-        cout << "ERROR: " << Unwrap(maybe_error) << endl;
-        exit(EXIT_FAILURE);
-    }
-
     Interpreter interpreter = Interpreter(service);
 
     string command;

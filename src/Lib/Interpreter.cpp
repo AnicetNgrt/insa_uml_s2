@@ -44,8 +44,11 @@ Afficher l’efficacité d’un cleaner ou de tous les cleaners d’un fournisse
 
 Commandes disponibles pour les comptes gouvernementaux:
 
-Classifier un utilisateur comme “fiable” ou “peu fiable”
-    flag-user -u [user ID] -flag [“reliable” | “unreliable”]
+Classifier un owner comme “fiable” ou “peu fiable”
+    flag-owner -o [owner ID] -flag [“reliable” | “unreliable”]
+
+Vérifier si un owner est classifié comme “fiable” ou “peu fiable”
+    owner-flag -o [owner ID]
 
 )";
 
@@ -67,8 +70,12 @@ Result<string, string> Interpreter::interpret(string command) const
         return Ok();
     } else if (name == "measurements") {
         return cmd_measurements(c);
-    } else if (name == "reconnect") {
-        return cmd_reconnect(c);
+    } else if (name == "login") {
+        return cmd_login(c);
+    } else if (name == "flag-owner") {
+        return cmd_flag_owner(c);
+    } else if (name == "owner-flag") {
+        return cmd_owner_flag(c);
     }
 
     return Err("No corresponding command was found");
@@ -85,7 +92,7 @@ Result<string, string> Interpreter::cmd_help() const
     return Ok(MANUAL);
 }
 
-Result<string, string> Interpreter::cmd_reconnect(Command& cmd) const
+Result<string, string> Interpreter::cmd_login(Command& cmd) const
 {
     auto username = cmd.find_arg("-u");
     auto password = cmd.find_arg("-p");
@@ -97,7 +104,7 @@ Result<string, string> Interpreter::cmd_reconnect(Command& cmd) const
     auto maybe_error = service.authenticate(UnwrapValue(username), UnwrapValue(password));
     if (some(maybe_error)) {
         switch(Unwrap(maybe_error)) {
-            case AuthError::USER_NOT_FOUND: return Err("User " + UnwrapValue(username) + " was not found");
+            case AuthError::USER_NOT_FOUND: return Err("User " + UnwrapValue(username) + " could not be found");
             case AuthError::WRONG_PASSWORD: return Err("Incorrect password for user " + UnwrapValue(username));
         }
     }
@@ -167,7 +174,40 @@ Result<string, string> Interpreter::cmd_quality_area(Command& cmd) const
 
 Result<string, string> Interpreter::cmd_flag_owner(Command& cmd) const
 {
-    auto id = cmd.find_arg("-u");
+    auto id = cmd.find_arg("-o");
+    if (failure(id))
+        return map_arg_error_to_message(id, "-o", "Owner id");
+
+    auto flag = cmd.find_owner_flag("-f");
+    if (failure(id))
+        return map_arg_error_to_message(flag, "-f", "Flag");
+
+    auto maybe_error = service.flag_owner(UnwrapValue(id), UnwrapValue(flag));
+    if (some(maybe_error)) {
+        switch (Unwrap(maybe_error)) {
+            case FlagError::OWNER_NOT_FOUND: return Err("Owner " + UnwrapValue(id) + " could not be found");
+            case FlagError::PERMISSION_DENIED: return Err("Permission denied");
+        }
+    }
+
+    return Ok("Owner " + UnwrapValue(id) + " was just flagged");
+}
+
+Result<string, string> Interpreter::cmd_owner_flag(Command& cmd) const
+{
+    auto id = cmd.find_arg("-o");
+    if (failure(id))
+        return map_arg_error_to_message(id, "-o", "Owner id");
+
+    auto flag = service.get_owner_flag(UnwrapValue(id));
+    if (some(flag)) {
+        switch (Unwrap(flag)) {
+            case OwnerFlag::RELIABLE: return Ok("Owner " + UnwrapValue(id) + " is flagged as reliable");
+            case OwnerFlag::UNRELIABLE: return Ok("Owner " + UnwrapValue(id) + " is flagged as unreliable");
+        }
+    } else {
+        return Err("Owner " + UnwrapValue(id) + " could not be found");
+    }
 }
 
 template <typename T>

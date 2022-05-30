@@ -23,7 +23,8 @@ public:
     Result<double, string> cleaner_efficiency(string cleaner_id) override;
     Result<double, string>
     provider_cleaners_efficiency(string provider) override;
-    void flag_owner(string owner_id, OwnerFlag flag) override;
+    Maybe<FlagError> flag_owner(string owner_id, OwnerFlag flag) override;
+    Maybe<OwnerFlag> get_owner_flag(string owner_id);
     Maybe<AuthError> authenticate(string username, string password) override;
     Maybe<User> authenticated_user() override;
 

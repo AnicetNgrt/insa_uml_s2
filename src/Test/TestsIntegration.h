@@ -82,7 +82,7 @@ A NO2 2016-02-03 14:00:00 1
 )");
 }
 
-TEST(integ_cmd_reconnect)
+TEST(integ_cmd_login)
 {
     auto users = new MockDatabase<User>({
         User("Mik", default_password_hasher("1313"), UserPermissionLevel::BASIC),
@@ -93,15 +93,82 @@ TEST(integ_cmd_reconnect)
     Service s = Service(session);
     Interpreter i = Interpreter(s);
 
-    auto res = i.interpret("reconnect -u Mike -p 12345");
+    ASSERT(none(s.authenticated_user()));
+
+    auto res = i.interpret("login -u Mike -p 12345");
     ASSERT(success(res));
     ASSERT_STREQ(UnwrapValue(res), "Connected as Mike");
 
-    res = i.interpret("reconnect -u Patrick -p 12345");
+    res = i.interpret("login -u Patrick -p 12345");
     ASSERT(failure(res));
-    ASSERT_STREQ(UnwrapError(res), "User Patrick was not found");
+    ASSERT_STREQ(UnwrapError(res), "User Patrick could not be found");
 
-    res = i.interpret("reconnect -u Mike -p 54321");
+    res = i.interpret("login -u Mike -p 54321");
     ASSERT(failure(res));
     ASSERT_STREQ(UnwrapError(res), "Incorrect password for user Mike");
+}
+
+TEST(integ_cmd_flag_owner)
+{
+    auto owners = new MockDatabase<Owner>({
+        Owner("A")
+    });
+    Session session = mock_session(0, 0, owners, 0, 0);
+    Service s = Service(session);
+    Interpreter i = Interpreter(s);
+
+    auto res2 = i.interpret("owner-flag -o A");
+    ASSERT(success(res2));
+    ASSERT_STREQ(UnwrapValue(res2), "Owner A is flagged as reliable");
+
+    session.authed_user = Some(User("", "", UserPermissionLevel::GOVERNMENT));
+    auto res = i.interpret("flag-owner -o A -f unreliable");
+    ASSERT(success(res));
+    ASSERT_STREQ(UnwrapValue(res), "Owner A was just flagged");
+    
+    res2 = i.interpret("owner-flag -o A");
+    ASSERT(success(res2));
+    ASSERT_STREQ(UnwrapValue(res2), "Owner A is flagged as unreliable");
+    
+    res = i.interpret("flag-owner -o A -f reliable");
+    ASSERT(success(res));
+    ASSERT_STREQ(UnwrapValue(res), "Owner A was just flagged");
+    
+    res2 = i.interpret("owner-flag -o A");
+    ASSERT(success(res2));
+    ASSERT_STREQ(UnwrapValue(res2), "Owner A is flagged as reliable");
+}
+
+TEST(integ_cmd_flag_owner_not_found)
+{
+    auto owners = new MockDatabase<Owner>({
+        Owner("A")
+    });
+    Session session = mock_session(0, 0, owners, 0, 0);
+    Service s = Service(session);
+    Interpreter i = Interpreter(s);
+
+    auto res2 = i.interpret("owner-flag -o B");
+    ASSERT(failure(res2));
+    ASSERT_STREQ(UnwrapError(res2), "Owner B could not be found");
+
+    session.authed_user = Some(User("", "", UserPermissionLevel::GOVERNMENT));
+    auto res = i.interpret("flag-owner -o B -f unreliable");
+    ASSERT(failure(res));
+    ASSERT_STREQ(UnwrapError(res), "Owner B could not be found");
+}
+
+TEST(integ_cmd_flag_owner_permission)
+{
+    auto owners = new MockDatabase<Owner>({
+        Owner("A")
+    });
+    Session session = mock_session(0, 0, owners, 0, 0);
+    Service s = Service(session);
+    Interpreter i = Interpreter(s);
+    
+    session.authed_user = Some(User("", "", UserPermissionLevel::BASIC));
+    auto res = i.interpret("flag-owner -o A -f unreliable");
+    ASSERT(failure(res));
+    ASSERT_STREQ(UnwrapError(res), "Permission denied");
 }

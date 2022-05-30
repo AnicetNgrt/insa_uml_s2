@@ -9,6 +9,7 @@ using namespace std;
 class Owner : public CSV_Assignable {
 public:
     Owner() {};
+    Owner(string id): id(id) {};
 
     string get_id() const { return id; };
 

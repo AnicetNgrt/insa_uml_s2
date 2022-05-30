@@ -1,7 +1,8 @@
 #include "Service.h"
 
-Service::Service(Session& session, string(*password_hasher)(string))
-    : session(session), password_hasher(password_hasher)
+Service::Service(Session& session, string (*password_hasher)(string))
+    : session(session)
+    , password_hasher(password_hasher)
 {
 }
 
@@ -24,31 +25,68 @@ Stream<Measurement>* Service::measurements(Maybe<string> sensor_id_filter,
 Result<double, string> Service::air_quality_area(double x, double y,
     double rad,
     Maybe<Timestamp> start,
-    Maybe<Timestamp> end) {
+    Maybe<Timestamp> end)
+{
+    throw "Unimplemented feature";
+    return Ok(0.0);
 }
 
 Result<double, string> Service::air_quality(double x, double y,
-    Timestamp& at) {
-
+    Timestamp& at)
+{
+    throw "Unimplemented feature";
+    return Ok(0.0);
 }
 
 Stream<Sensor>* Service::similar_sensors(string sensor_id, int n,
     Maybe<Timestamp> start,
-    Maybe<Timestamp> end) { }
+    Maybe<Timestamp> end) {
+    throw "Unimplemented feature";
+    return new StreamClosure<Sensor>();
+}
 
 Result<double, string> Service::cleaner_efficiency(string cleaner_id) { }
 
 Result<double, string> Service::provider_cleaners_efficiency(
-    string provider) { }
+    string provider) {
+    throw "Unimplemented feature";
+    return Ok(0.0);
+}
 
-void Service::flag_owner(string owner_id, OwnerFlag flag)
+Maybe<FlagError> Service::flag_owner(string owner_id, OwnerFlag flag)
 {
+    auto user = authenticated_user();
+    if (none(user))
+        return Some(FlagError::PERMISSION_DENIED);
+    if (some(user) && Unwrap(user).get_permission_level() != UserPermissionLevel::GOVERNMENT)
+        return Some(FlagError::PERMISSION_DENIED);
+
     auto filter = [&](const Owner& owner) -> bool {
         return owner.get_id() == owner_id;
     };
     auto owner_stream = session.owners_db->filter_and_stream(filter);
     if (some(owner_stream->receive())) {
-        session.owners_flags.insert(make_pair(owner_id, flag));
+        session.owners_flags[owner_id] = flag;
+    } else {
+        return Some(FlagError::OWNER_NOT_FOUND);
+    }
+    return None;
+}
+
+Maybe<OwnerFlag> Service::get_owner_flag(string owner_id) {
+    auto res = session.owners_flags.find(owner_id);
+    if (res == session.owners_flags.end()) {
+        auto filter = [&](const Owner& owner) -> bool {
+            return owner.get_id() == owner_id;
+        };
+        auto owner_stream = session.owners_db->filter_and_stream(filter);
+        if (some(owner_stream->receive())) {
+            return Some(OwnerFlag::RELIABLE);
+        } else {
+            return None;
+        }
+    } else {
+        return Some(res->second);
     }
 }
 
@@ -56,7 +94,7 @@ string default_password_hasher(string password)
 {
     // Obviously this is for demonstration purposes
     // In production, please link a proper cryptographic hashing & salting implementation
-    // that has been thoroughly tested and used by industry projects before.
+    // that has been thoroughly tested and used in industry projects before.
     return password;
 }
 
