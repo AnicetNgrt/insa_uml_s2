@@ -18,7 +18,7 @@ csv_parser_from_file(string csv_file_path)
     if (getline(*file, row)) {
         stringstream row_ss(row);
         string column_title;
-        while (getline(row_ss, column_title, ',')) {
+        while (getline(row_ss, column_title, ';')) {
             rows->push_back(column_title);
         }
     } else {
@@ -33,7 +33,7 @@ csv_parser_from_file(string csv_file_path)
         if (getline(*file, row)) {
             stringstream row_ss(row);
             string column_value;
-            for (size_t i = 0; getline(row_ss, column_value, ',') && i < rows->size(); ++i) {
+            for (size_t i = 0; getline(row_ss, column_value, ';') && i < rows->size(); ++i) {
                 if (column_value.length() > 0) {
                     data.insert(make_pair(rows->at(i), column_value));
                 }
