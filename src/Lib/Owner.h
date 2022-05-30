@@ -15,7 +15,7 @@ public:
 
     bool assign_from_csv(CSV_Row const& csv_row) override
     {
-        CSV_TRY_ASSIGN_STRING(id, "id")
+        CSV_TRY_ASSIGN_STRING(id, "provider id")
         return true;
     }
 
