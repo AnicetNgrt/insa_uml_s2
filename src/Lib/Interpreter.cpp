@@ -8,7 +8,7 @@ auto MANUAL = R"(
 Utilisation générale: airwatcher [ options ... ]
 
 options:
-    -d    (optionel) Spécifie le répertoire du jeu de données, par défaut ./dataset/
+    -d    (optionnel) Spécifie le répertoire du jeu de données, par défaut ./dataset/
 
 L’application affiche la liste des commandes disponibles pour l’utilisateur ainsi qu’un prompt pour laisser l’utilisateur entrer une commande.
 
