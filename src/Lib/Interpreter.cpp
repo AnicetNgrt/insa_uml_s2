@@ -1,5 +1,6 @@
 #include <sstream>
 #include <unordered_map>
+#include <chrono>
 
 #include "Interpreter.h"
 #include "AirQuality.h"
@@ -97,7 +98,11 @@ Result<string, string> Interpreter::cmd_login(Command& cmd) const
     if (failure(password))
         return map_arg_error_to_message(password, "-p", "Password");
 
+    auto t1 = chrono::high_resolution_clock::now();
     auto maybe_error = service.authenticate(UnwrapValue(username), UnwrapValue(password));
+    auto t2 = chrono::high_resolution_clock::now();
+    cout << "PERF: " << chrono::duration_cast<chrono::milliseconds>(t2 - t1).count() << " ms" << endl;
+
     if (some(maybe_error)) {
         switch (Unwrap(maybe_error)) {
         case AuthError::USER_NOT_FOUND:
@@ -125,6 +130,7 @@ Result<string, string> Interpreter::cmd_measurements(Command& cmd) const
     if (failure(type) && !is_error(type, ArgError::ARG_NOT_FOUND))
         return map_arg_error_to_message(type, "-t", "Measurement type");
 
+    auto t1 = chrono::high_resolution_clock::now();
     auto measurements_stream = service.measurements(to_maybe(id), to_maybe(type), to_maybe(time));
 
     stringstream formatted;
@@ -135,7 +141,12 @@ Result<string, string> Interpreter::cmd_measurements(Command& cmd) const
     }
 
     delete measurements_stream;
-    return Ok(formatted.str());
+    auto formatted_str = formatted.str();
+
+    auto t2 = chrono::high_resolution_clock::now();
+    cout << "PERF: " << chrono::duration_cast<chrono::milliseconds>(t2 - t1).count() << " ms" << endl;
+
+    return Ok(formatted_str);
 }
 
 Result<string, string> Interpreter::cmd_quality_area(Command& cmd) const
@@ -157,7 +168,10 @@ Result<string, string> Interpreter::cmd_quality_area(Command& cmd) const
     if (failure(end) && !is_error(end, ArgError::ARG_NOT_FOUND))
         return map_arg_error_to_message(end, "-end", "End timestamp");
 
+    auto t1 = chrono::high_resolution_clock::now();
     auto quality_area = service.air_quality_area(UnwrapValue(lt), UnwrapValue(lg), UnwrapValue(rad), to_maybe(start), to_maybe(end));
+    auto t2 = chrono::high_resolution_clock::now();
+    cout << "PERF: " << chrono::duration_cast<chrono::milliseconds>(t2 - t1).count() << " ms" << endl;
 
     auto quality_area_to_message = [&](AirQuality quality_area) {
         stringstream formatted;
@@ -181,8 +195,12 @@ Result<string, string> Interpreter::cmd_flag_owner(Command& cmd) const
     auto flag = cmd.find_owner_flag("-f");
     if (failure(id))
         return map_arg_error_to_message(flag, "-f", "Flag");
-
+    
+    auto t1 = chrono::high_resolution_clock::now();    
     auto maybe_error = service.flag_owner(UnwrapValue(id), UnwrapValue(flag));
+    auto t2 = chrono::high_resolution_clock::now();
+    cout << "PERF: " << chrono::duration_cast<chrono::milliseconds>(t2 - t1).count() << " ms" << endl;
+
     if (some(maybe_error)) {
         switch (Unwrap(maybe_error)) {
         case FlagError::OWNER_NOT_FOUND:
@@ -201,7 +219,11 @@ Result<string, string> Interpreter::cmd_owner_flag(Command& cmd) const
     if (failure(id))
         return map_arg_error_to_message(id, "-o", "Owner id");
 
+    auto t1 = chrono::high_resolution_clock::now();
     auto flag = service.get_owner_flag(UnwrapValue(id));
+    auto t2 = chrono::high_resolution_clock::now();
+    cout << "PERF: " << chrono::duration_cast<chrono::milliseconds>(t2 - t1).count() << " ms" << endl;
+    
     if (some(flag)) {
         switch (Unwrap(flag)) {
         case OwnerFlag::RELIABLE:

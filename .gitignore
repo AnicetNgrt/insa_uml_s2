@@ -1,5 +1,5 @@
 .vscode/
-uml
-uml_tests
-uml_perso
+airwatcher
+airwatcher_tests
+airwatcher_perso
 *.test.csv
