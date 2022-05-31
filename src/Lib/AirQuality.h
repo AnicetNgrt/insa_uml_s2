@@ -3,8 +3,8 @@
 #include <string>
 #include <unordered_map>
 
-#include "Measurement.h"
 #include "../Utils/Stream.h"
+#include "Measurement.h"
 
 using namespace std;
 

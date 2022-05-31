@@ -3,10 +3,10 @@
 #include <functional>
 #include <string>
 
-#include "./Measurement.h"
-#include "./Provider.h"
 #include "../Utils/Result.h"
 #include "../Utils/Timestamp.h"
+#include "./Measurement.h"
+#include "./Provider.h"
 
 using namespace std;
 
