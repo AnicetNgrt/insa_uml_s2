@@ -14,10 +14,9 @@ int main(int argc, const char* argv[])
         cout << "ERROR: " << UnwrapError(session_parsing_result) << endl;
         exit(EXIT_FAILURE);
     }
-
     Session session = UnwrapValue(session_parsing_result);
+    
     Service service = Service(session);
-
     Interpreter interpreter = Interpreter(service);
 
     cout << "Type \"help\" to display user manual." << endl;

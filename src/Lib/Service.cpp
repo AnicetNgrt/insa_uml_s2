@@ -32,9 +32,6 @@ Result<AirQuality, string> Service::air_quality_area(double x, double y,
 
     auto filter_measurements = [&](const Measurement& m) -> bool {
         // checking timestamps
-        // cout << timestamp_to_string(m.get_timestamp()) << endl;
-        // cout << timestamp_compare(m.get_timestamp(), Unwrap(start)) << endl;
-        // cout << timestamp_compare(m.get_timestamp(), Unwrap(end)) << endl;
         bool start_good = some(start) ? timestamp_compare(m.get_timestamp(), Unwrap(start)) > -1 : true;
         bool end_good = some(end) ? timestamp_compare(m.get_timestamp(), Unwrap(end)) < 1 : true;
         if (!start_good || !end_good) return false;
