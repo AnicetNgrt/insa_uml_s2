@@ -1,13 +1,13 @@
 #include "MockSession.h"
 
-Session mock_session(Database<User>* users, Database<Cleaner>* cleaners, Database<Owner>* owners, Database<Measurement>* measurements, Database<Sensor>* sensors)
+Session mock_session(Database<User>* users, Database<Cleaner>* cleaners, Database<Provider>* providers, Database<Measurement>* measurements, Database<Sensor>* sensors)
 {
     if (users == nullptr)
         users = new MockDatabase<User>({});
     if (cleaners == nullptr)
         cleaners = new MockDatabase<Cleaner>({});
-    if (owners == nullptr)
-        owners = new MockDatabase<Owner>({});
+    if (providers == nullptr)
+        providers = new MockDatabase<Provider>({});
     if (measurements == nullptr)
         measurements = new MockDatabase<Measurement>({});
     if (sensors == nullptr)
@@ -15,10 +15,10 @@ Session mock_session(Database<User>* users, Database<Cleaner>* cleaners, Databas
     return {
         users,
         cleaners,
-        owners,
+        providers,
         measurements,
         sensors,
         None,
-        unordered_map<string, OwnerFlag>()
+        unordered_map<string, ProviderFlag>()
     };
 }

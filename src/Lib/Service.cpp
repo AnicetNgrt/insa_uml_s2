@@ -104,7 +104,7 @@ Result<double, string> Service::provider_cleaners_efficiency(
     return Ok(0.0);
 }
 
-Maybe<FlagError> Service::flag_owner(string owner_id, OwnerFlag flag)
+Maybe<FlagError> Service::flag_provider(string provider_id, ProviderFlag flag)
 {
     auto user = authenticated_user();
     if (none(user))
@@ -112,36 +112,36 @@ Maybe<FlagError> Service::flag_owner(string owner_id, OwnerFlag flag)
     if (some(user) && Unwrap(user).get_permission_level() != UserPermissionLevel::GOVERNMENT)
         return Some(FlagError::PERMISSION_DENIED);
 
-    auto filter = [&](const Owner& owner) -> bool {
-        return owner.get_id() == owner_id;
+    auto filter = [&](const Provider& provider) -> bool {
+        return provider.get_id() == provider_id;
     };
 
-    auto owners_stream = session.owners_db->filter_and_stream(filter);
-    auto owner = owners_stream->receive();
-    delete owners_stream;
+    auto providers_stream = session.providers_db->filter_and_stream(filter);
+    auto provider = providers_stream->receive();
+    delete providers_stream;
 
-    if (some(owner)) {
-        session.owners_flags[owner_id] = flag;
+    if (some(provider)) {
+        session.providers_flags[provider_id] = flag;
     } else {
-        return Some(FlagError::OWNER_NOT_FOUND);
+        return Some(FlagError::PROVIDER_NOT_FOUND);
     }
     return None;
 }
 
-Maybe<OwnerFlag> Service::get_owner_flag(string owner_id)
+Maybe<ProviderFlag> Service::get_provider_flag(string provider_id)
 {
-    auto res = session.owners_flags.find(owner_id);
-    if (res == session.owners_flags.end()) {
-        auto filter = [&](const Owner& owner) -> bool {
-            return owner.get_id() == owner_id;
+    auto res = session.providers_flags.find(provider_id);
+    if (res == session.providers_flags.end()) {
+        auto filter = [&](const Provider& provider) -> bool {
+            return provider.get_id() == provider_id;
         };
 
-        auto owners_stream = session.owners_db->filter_and_stream(filter);
-        auto owner = owners_stream->receive();
-        delete owners_stream;
+        auto providers_stream = session.providers_db->filter_and_stream(filter);
+        auto provider = providers_stream->receive();
+        delete providers_stream;
 
-        if (some(owner)) {
-            return Some(OwnerFlag::RELIABLE);
+        if (some(provider)) {
+            return Some(ProviderFlag::RELIABLE);
         } else {
             return None;
         }

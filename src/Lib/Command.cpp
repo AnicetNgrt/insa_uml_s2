@@ -102,9 +102,9 @@ Result<MeasurementType, ArgError> Command::find_measurement_type(string arg_name
     return find_arg(arg_name, &measurement_type_from_string);
 }
 
-Result<OwnerFlag, ArgError> Command::find_owner_flag(string arg_name) const
+Result<ProviderFlag, ArgError> Command::find_provider_flag(string arg_name) const
 {
-    return find_arg(arg_name, &owner_flag_from_string);
+    return find_arg(arg_name, &provider_flag_from_string);
 }
 
 Result<double, ArgError> Command::find_double(string arg_name) const

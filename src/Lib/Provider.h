@@ -6,10 +6,10 @@ using namespace std;
 
 #include "../Utils/CSV.h"
 
-class Owner : public CSV_Assignable {
+class Provider : public CSV_Assignable {
 public:
-    Owner() {};
-    Owner(string id): id(id) {};
+    Provider() {};
+    Provider(string id): id(id) {};
 
     string get_id() const { return id; };
 
@@ -23,7 +23,7 @@ private:
     string id;
 };
 
-enum class OwnerFlag { RELIABLE,
+enum class ProviderFlag { RELIABLE,
     UNRELIABLE };
 
-OwnerFlag owner_flag_from_string(string s);
+ProviderFlag provider_flag_from_string(string s);

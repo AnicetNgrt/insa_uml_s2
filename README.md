@@ -21,10 +21,10 @@
 - `measurements -s Sensor0 -t O3`
 - `measurements -s Sensor0 -ts "2019-01-21 12:00:00" -t O3`
 
-- `flag-owner -o Provider0 -f unreliable` (permission denied)
+- `flag-provider -o Provider0 -f unreliable` (permission denied)
 - `login -u User1 -p 1234` (login as government)
-- `flag-owner -o Provider0 -f unreliable` (again)
-- `owner-flag -o Provider0`
+- `flag-provider -o Provider0 -f unreliable` (again)
+- `provider-flag -o Provider0`
 
 - `quality-area -begin "2019-01-21 12:00:00" -end "2019-01-21 13:00:00" -lt 44 -lg 4.6 -rad 10`
 - `quality-area -begin "2019-04-17 12:00:00" -end "2019-04-19 13:00:00" -lt 44 -lg 4.6 -rad 10`

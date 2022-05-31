@@ -13,11 +13,11 @@ Result<Session, string> from_command(Command& cmd)
     Session opened_session = {
         new DatabaseCSV<User>(dataset_dir + "/users.csv"),
         new DatabaseCSV<Cleaner>(dataset_dir + "/cleaners.csv"),
-        new DatabaseCSV<Owner>(dataset_dir + "/providers.csv"),
+        new DatabaseCSV<Provider>(dataset_dir + "/providers.csv"),
         new DatabaseCSV<Measurement>(dataset_dir + "/measurements.csv"),
         new DatabaseCSV<Sensor>(dataset_dir + "/sensors.csv"),
         None,
-        unordered_map<string, OwnerFlag>()
+        unordered_map<string, ProviderFlag>()
     };
     return Ok(opened_session);
 }

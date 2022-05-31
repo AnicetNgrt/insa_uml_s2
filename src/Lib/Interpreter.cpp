@@ -36,13 +36,13 @@ Afficher la qualité de l’air moyen dans une zone donnée pendant une période
 (Dans une version future) Afficher les capteurs les plus similaires à un capteur donné pendant une période donnée
     sensors-matching -s [sensor ID] -begin [horodatage début (YYYY-MM-DD HH:MM:SS) (optionnel)] -end [horodatage fin (YYYY-MM-DD HH:MM:SS) (optionnel)]
 
-Vérifier si un owner est classifié comme “fiable” ou “peu fiable”
-    owner-flag -o [owner ID]
+Vérifier si un provider est classifié comme “fiable” ou “peu fiable”
+    provider-flag -o [provider ID]
 
 Commandes disponibles pour les comptes gouvernementaux:
 
-Classifier un owner comme “fiable” ou “peu fiable”
-    flag-owner -o [owner ID] -flag [“reliable” | “unreliable”]
+Classifier un provider comme “fiable” ou “peu fiable”
+    flag-provider -o [provider ID] -flag [“reliable” | “unreliable”]
 
 )";
 
@@ -69,10 +69,10 @@ Result<string, string> Interpreter::interpret(string command) const
         return cmd_quality_area(c);
     } else if (name == "login") {
         return cmd_login(c);
-    } else if (name == "flag-owner") {
-        return cmd_flag_owner(c);
-    } else if (name == "owner-flag") {
-        return cmd_owner_flag(c);
+    } else if (name == "flag-provider") {
+        return cmd_flag_provider(c);
+    } else if (name == "provider-flag") {
+        return cmd_provider_flag(c);
     }
 
     return Err("No corresponding command was found");
@@ -186,53 +186,53 @@ Result<string, string> Interpreter::cmd_quality_area(Command& cmd) const
     }
 }
 
-Result<string, string> Interpreter::cmd_flag_owner(Command& cmd) const
+Result<string, string> Interpreter::cmd_flag_provider(Command& cmd) const
 {
     auto id = cmd.find_arg("-o");
     if (failure(id))
-        return map_arg_error_to_message(id, "-o", "Owner id");
+        return map_arg_error_to_message(id, "-o", "Provider id");
 
-    auto flag = cmd.find_owner_flag("-f");
+    auto flag = cmd.find_provider_flag("-f");
     if (failure(id))
         return map_arg_error_to_message(flag, "-f", "Flag");
     
     auto t1 = chrono::high_resolution_clock::now();    
-    auto maybe_error = service.flag_owner(UnwrapValue(id), UnwrapValue(flag));
+    auto maybe_error = service.flag_provider(UnwrapValue(id), UnwrapValue(flag));
     auto t2 = chrono::high_resolution_clock::now();
     cout << "PERF: " << chrono::duration_cast<chrono::milliseconds>(t2 - t1).count() << " ms" << endl;
 
     if (some(maybe_error)) {
         switch (Unwrap(maybe_error)) {
-        case FlagError::OWNER_NOT_FOUND:
-            return Err("Owner " + UnwrapValue(id) + " could not be found");
+        case FlagError::PROVIDER_NOT_FOUND:
+            return Err("Provider " + UnwrapValue(id) + " could not be found");
         case FlagError::PERMISSION_DENIED:
             return Err("Permission denied");
         }
     }
 
-    return Ok("Owner " + UnwrapValue(id) + " was just flagged");
+    return Ok("Provider " + UnwrapValue(id) + " was just flagged");
 }
 
-Result<string, string> Interpreter::cmd_owner_flag(Command& cmd) const
+Result<string, string> Interpreter::cmd_provider_flag(Command& cmd) const
 {
     auto id = cmd.find_arg("-o");
     if (failure(id))
-        return map_arg_error_to_message(id, "-o", "Owner id");
+        return map_arg_error_to_message(id, "-o", "Provider id");
 
     auto t1 = chrono::high_resolution_clock::now();
-    auto flag = service.get_owner_flag(UnwrapValue(id));
+    auto flag = service.get_provider_flag(UnwrapValue(id));
     auto t2 = chrono::high_resolution_clock::now();
     cout << "PERF: " << chrono::duration_cast<chrono::milliseconds>(t2 - t1).count() << " ms" << endl;
     
     if (some(flag)) {
         switch (Unwrap(flag)) {
-        case OwnerFlag::RELIABLE:
-            return Ok("Owner " + UnwrapValue(id) + " is flagged as reliable");
-        case OwnerFlag::UNRELIABLE:
-            return Ok("Owner " + UnwrapValue(id) + " is flagged as unreliable");
+        case ProviderFlag::RELIABLE:
+            return Ok("Provider " + UnwrapValue(id) + " is flagged as reliable");
+        case ProviderFlag::UNRELIABLE:
+            return Ok("Provider " + UnwrapValue(id) + " is flagged as unreliable");
         }
     } else {
-        return Err("Owner " + UnwrapValue(id) + " could not be found");
+        return Err("Provider " + UnwrapValue(id) + " could not be found");
     }
 }
 
