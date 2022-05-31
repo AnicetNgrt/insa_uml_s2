@@ -123,6 +123,7 @@ function<string(ArgError)> arg_error_to_string(string arg_name, string friendly_
         case ArgError::VALUE_NOT_PARSABLE:
             return friendly_name + " (argument " + arg_name + ") had an invalid value";
         }
+        return "unknown arg error";
     };
 }
 

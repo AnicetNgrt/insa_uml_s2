@@ -14,7 +14,10 @@
 BIN := airwatcher
 
 # Options de compilation
-OPTIONS := -g -Wall -ansi -pedantic -std=c++11
+OPTIONS := -g -Wall -ansi -pedantic -std=c++11 
+ifdef perf
+OPTIONS += -DPERF_SHOW=1
+endif
 
 # Liste des sous-répertoires de src/ contenant des sources à compiler
 # 	nb : Ne pas inclure les répertoires contenant des sources déclarant un main

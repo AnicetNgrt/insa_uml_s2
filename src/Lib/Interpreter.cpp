@@ -5,6 +5,22 @@
 #include "Interpreter.h"
 #include "AirQuality.h"
 
+#ifndef PERF_SHOW
+#define PERF_SHOW 0 
+#endif
+
+#if PERF_SHOW == 1
+#define PERF_START() auto t1 = chrono::high_resolution_clock::now()
+#else
+#define PERF_START()
+#endif
+
+#if PERF_SHOW == 1
+#define PERF_END() cout << "PERF: " << chrono::duration_cast<chrono::milliseconds>(chrono::high_resolution_clock::now() - t1).count() << " ms" << endl
+#else
+#define PERF_END()
+#endif
+
 auto MANUAL = R"(
 Utilisation générale: airwatcher [ options ... ]
 
@@ -98,10 +114,9 @@ Result<string, string> Interpreter::cmd_login(Command& cmd) const
     if (failure(password))
         return map_arg_error_to_message(password, "-p", "Password");
 
-    auto t1 = chrono::high_resolution_clock::now();
+    PERF_START();
     auto maybe_error = service.authenticate(UnwrapValue(username), UnwrapValue(password));
-    auto t2 = chrono::high_resolution_clock::now();
-    cout << "PERF: " << chrono::duration_cast<chrono::milliseconds>(t2 - t1).count() << " ms" << endl;
+    PERF_END();
 
     if (some(maybe_error)) {
         switch (Unwrap(maybe_error)) {
@@ -130,7 +145,7 @@ Result<string, string> Interpreter::cmd_measurements(Command& cmd) const
     if (failure(type) && !is_error(type, ArgError::ARG_NOT_FOUND))
         return map_arg_error_to_message(type, "-t", "Measurement type");
 
-    auto t1 = chrono::high_resolution_clock::now();
+    PERF_START();
     auto measurements_stream = service.measurements(to_maybe(id), to_maybe(type), to_maybe(time));
 
     stringstream formatted;
@@ -142,9 +157,7 @@ Result<string, string> Interpreter::cmd_measurements(Command& cmd) const
 
     delete measurements_stream;
     auto formatted_str = formatted.str();
-
-    auto t2 = chrono::high_resolution_clock::now();
-    cout << "PERF: " << chrono::duration_cast<chrono::milliseconds>(t2 - t1).count() << " ms" << endl;
+    PERF_END();
 
     return Ok(formatted_str);
 }
@@ -168,10 +181,9 @@ Result<string, string> Interpreter::cmd_quality_area(Command& cmd) const
     if (failure(end) && !is_error(end, ArgError::ARG_NOT_FOUND))
         return map_arg_error_to_message(end, "-end", "End timestamp");
 
-    auto t1 = chrono::high_resolution_clock::now();
+    PERF_START();
     auto quality_area = service.air_quality_area(UnwrapValue(lt), UnwrapValue(lg), UnwrapValue(rad), to_maybe(start), to_maybe(end));
-    auto t2 = chrono::high_resolution_clock::now();
-    cout << "PERF: " << chrono::duration_cast<chrono::milliseconds>(t2 - t1).count() << " ms" << endl;
+    PERF_END();
 
     auto quality_area_to_message = [&](AirQuality quality_area) {
         stringstream formatted;
@@ -195,11 +207,10 @@ Result<string, string> Interpreter::cmd_flag_provider(Command& cmd) const
     auto flag = cmd.find_provider_flag("-f");
     if (failure(id))
         return map_arg_error_to_message(flag, "-f", "Flag");
-    
-    auto t1 = chrono::high_resolution_clock::now();    
+
+    PERF_START();
     auto maybe_error = service.flag_provider(UnwrapValue(id), UnwrapValue(flag));
-    auto t2 = chrono::high_resolution_clock::now();
-    cout << "PERF: " << chrono::duration_cast<chrono::milliseconds>(t2 - t1).count() << " ms" << endl;
+    PERF_END();
 
     if (some(maybe_error)) {
         switch (Unwrap(maybe_error)) {
@@ -219,11 +230,10 @@ Result<string, string> Interpreter::cmd_provider_flag(Command& cmd) const
     if (failure(id))
         return map_arg_error_to_message(id, "-o", "Provider id");
 
-    auto t1 = chrono::high_resolution_clock::now();
+    PERF_START();
     auto flag = service.get_provider_flag(UnwrapValue(id));
-    auto t2 = chrono::high_resolution_clock::now();
-    cout << "PERF: " << chrono::duration_cast<chrono::milliseconds>(t2 - t1).count() << " ms" << endl;
-    
+    PERF_END();
+
     if (some(flag)) {
         switch (Unwrap(flag)) {
         case ProviderFlag::RELIABLE:
@@ -231,9 +241,8 @@ Result<string, string> Interpreter::cmd_provider_flag(Command& cmd) const
         case ProviderFlag::UNRELIABLE:
             return Ok("Provider " + UnwrapValue(id) + " is flagged as unreliable");
         }
-    } else {
-        return Err("Provider " + UnwrapValue(id) + " could not be found");
     }
+    return Err("Provider " + UnwrapValue(id) + " could not be found");
 }
 
 template <typename T>

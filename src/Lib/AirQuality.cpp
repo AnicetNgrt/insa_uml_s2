@@ -11,10 +11,6 @@ AirQuality air_quality_compute(Stream<Measurement>* measurements)
         { MeasurementType::SO2, { 0.0, 0 } }
     };
 
-    auto calculate_average = [](pair<double, int> data) -> double {
-        return data.second != 0 ? data.first / (double)data.second : 0;
-    };
-
     Maybe<Measurement> maybe_m = None;
     while (some((maybe_m = measurements->receive()))) {
         Measurement m = Unwrap(maybe_m);
@@ -66,4 +62,5 @@ string air_quality_to_string(AirQuality air_quality)
     case AirQuality::HAZARDOUS:
         return "hazardous";
     }
+    return "unknown";
 }
