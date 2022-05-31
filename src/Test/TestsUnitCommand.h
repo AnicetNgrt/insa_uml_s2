@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Dependencies/microtest.h"
-#include "../Utils/Command.h"
+#include "../Lib/Command.h"
 
 TEST(unit_command_expected_name_and_args)
 {
